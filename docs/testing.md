@@ -9,7 +9,7 @@ On 22 October 2026 (session date), Codex ran:
 ```
 
 Environment: Python 3.12.10, pytest 9.1.1. Latest full-suite result:
-**132 passed, 0 failed** (models, validation, storage and reports).
+**146 passed, 0 failed** (models, validation, storage, reports and CLI).
 All test entries are synthetic.
 Stage 1 originally passed 10 model tests; its results are retained below.
 
@@ -28,9 +28,9 @@ Stage 1 originally passed 10 model tests; its results are retained below.
 
 ## Manual evidence
 
-No end-to-end CLI checks or screenshots have been performed for this stage.
-The CLI and persistence layers are not implemented yet. Screenshots should be
-captured from genuine runs after those features exist.
+Live terminal check after Step 5: an invalid choice returned to the menu and
+`0` printed `Goodbye.` and exited normally. Full entry-point flows will be
+checked after Step 6. No screenshots have been captured.
 
 ## Step 2: Validation
 
@@ -75,3 +75,18 @@ Full suite: 132 passed, 0 failed; 14 report cases.
 | R06 | Daily totals | Unordered dates | Correct daily totals in ascending date order | Matched | Pass |
 | R07 | Invalid range | Start date after end date for all report APIs | Clear ValueError | Matched | Pass |
 | R08 | Numeric/input boundaries | Fractional nutrients and single-use iterators | Correct rounded totals; no lost entries | Matched | Pass |
+
+## Step 5: CLI menu
+
+Full suite: 146 passed, 0 failed; 14 CLI cases.
+
+| Test ID | Feature | Input/action | Expected result | Actual result | Pass/fail |
+| --- | --- | --- | --- | --- | --- |
+| C01 | Workout workflow | Add, view and report a sample entry | Saved ID, displayed entry and 300.0 volume | Matched | Pass |
+| C02 | Meal workflow | Add, view and report a sample meal | Saved nutrients, 520 kcal and daily totals | Matched | Pass |
+| C03 | Input retries | Invalid choice, date, text, sets, reps and weight | Errors explained; valid retry saved | Matched | Pass |
+| C04 | Deletion | n, yes, blank, invalid, y and absent ID | Only explicit y deletes an existing target | Matched | Pass |
+| C05 | Empty collections | View and report no records | Clear empty messages and zero totals | Matched | Pass |
+| C06 | Corrupt storage | View invalid JSON | Error shown; file unchanged; menu remains usable | Matched | Pass |
+| C07 | Cancellation | EOF and Ctrl+C during entry | Normal exit; no partial record saved | Matched | Pass |
+| C08 | Live menu smoke check | Enter invalid, then 0 in a real terminal session | Retry message then Goodbye and exit | Observed | Pass |

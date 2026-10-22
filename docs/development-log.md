@@ -101,11 +101,31 @@ completed by the student in their own words.
 - What I learned: Student reflection pending; explain why returned results and
   explicit metric definitions make reports easier to test and interpret.
 
+## Step 5: Interactive menu
+
+- Date: 22 October 2026 (session date).
+- Task: Implement the menu in the existing `fitfor/cli.py` module.
+- Files changed: `fitfor/cli.py`, `tests/test_cli.py`, this log and
+  `docs/testing.md`.
+- What was implemented: Add/view/delete workflows, field retries, optional
+  notes/load, date-filtered reports, aligned tables, confirmation before
+  deletion, and graceful EOF/Ctrl+C and storage-error handling.
+- Problem encountered: Input interrupted midway through entry must not leave
+  partial records, and invalid input should not terminate the menu.
+- How it was solved: Gather and validate a complete entry before saving; catch
+  expected errors at the UI boundary. Supply input/output functions in tests.
+- Tests performed: Full suite: 146 passed, 0 failed, including 14 CLI cases.
+  Live terminal check: invalid choice returned to the menu; `0` exited normally.
+- Git commit: `feat: add interactive FitFor CLI menu`.
+- What I learned: Student reflection pending; explain the separation between
+  prompts, validation, persistence and calculations.
+
 ## Publication status during development
 
 The Step 2 push returned `Cannot prompt because user interactivity has been
 disabled` / `unable to get password from user`. Commits `babd4ea` and `8d3da7a`
 were still local at that attempt. The Step 3 push failed for the same reason;
-`e01b1fe` is also pending. Development continues under the user's updated
+`e01b1fe` is also pending. The Step 4 push also failed with that error, leaving
+`da6fa38` local. Development continues under the user's updated
 instruction. Credentials are not modified; each stage attempts a normal push.
 The final audit will list all commits still awaiting manual publication.
