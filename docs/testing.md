@@ -137,3 +137,13 @@ Full suite: 180 passed, 0 failed; 12 additional privacy/control cases.
 
 The threat model and campaign document describe implemented controls and
 residual risks. Campaign effectiveness has not been measured.
+
+## Step 9: Documentation review
+
+Required full-suite rerun: **180 passed, 0 failed**. No runtime code was changed
+for this stage and no tests were added merely to mirror documentation text.
+
+| Test ID | Feature | Input/action | Expected result | Actual result | Pass/fail |
+| --- | --- | --- | --- | --- | --- |
+| D01 | README accuracy | Compare instructions/features with source and earlier live checks | Reproducible commands; implemented features only | Reviewed and matched | Pass |
+| D02 | Evidence provenance | Review assessment checklist and linked documents | Personal reflection, screenshots and external assessment tasks left pending | Matched | Pass |

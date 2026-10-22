@@ -176,6 +176,24 @@ completed by the student in their own words.
 - What I learned: Student reflection pending; relate the implemented controls
   to human vulnerabilities and explain the residual risks in the threat table.
 
+## Step 9: README and assessment documentation
+
+- Date: 22 October 2026 (session date).
+- Task: Document only implemented features and genuine evidence.
+- Files changed: `README.md`, `docs/assessment-checklist.md`, this log and
+  `docs/testing.md`.
+- What was implemented: Setup/run/test instructions, architecture, metric
+  definitions, local-data/recovery guidance, limitations, evidence links and
+  a clear list of remaining student assessment actions.
+- Problem encountered: Agent implementation activity must not be presented as
+  personal reflection, fabricated screenshots or measured campaign success.
+- How it was solved: State evidence provenance and leave those items pending.
+- Tests performed: Full suite: 180 passed, 0 failed. Documentation reviewed
+  against actual modules, commands, privacy controls and storage behaviour.
+- Git commit: `docs: complete FitFor project documentation`.
+- What I learned: Student reflection pending; explain how truthful limitations
+  and reproducible instructions support professional software documentation.
+
 ## Publication status during development
 
 The Step 2 push returned `Cannot prompt because user interactivity has been
@@ -185,6 +203,7 @@ were still local at that attempt. The Step 3 push failed for the same reason;
 `da6fa38` local. Step 5 push failed identically; `3b879ba` is pending too.
 The Step 6 push also failed identically; `2582d9e` is pending.
 The Step 7 push failed identically; `6f28841` is pending.
+The Step 8 push failed identically; `5385e8b` is pending.
 Development continues under the user's updated
 instruction. Credentials are not modified; each stage attempts a normal push.
 The final audit will list all commits still awaiting manual publication.
