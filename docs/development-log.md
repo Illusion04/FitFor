@@ -82,10 +82,30 @@ completed by the student in their own words.
 - What I learned: Student reflection pending; compare atomic replacement with
   overwriting a file directly and explain the limits of single-writer storage.
 
+## Step 4: Reports
+
+- Date: 22 October 2026 (session date).
+- Task: Calculate workout and nutrition summaries independently of the CLI.
+- Files changed: `fitfor/reports.py`, `tests/test_reports.py`, this log and
+  `docs/testing.md`.
+- What was implemented: Entry/day/exercise counts, total sets and repetitions
+  across sets, recorded-load volume, total kcal/macronutrients, daily nutrition
+  totals, and inclusive optional date boundaries.
+- Problem encountered: Exercise entries do not represent whole workout
+  sessions, and missing loads must not imply known zero workload.
+- How it was solved: Report entries and recorded days separately; report both
+  known-load and missing-load entry counts. Document the volume formula.
+- Tests performed: Full suite: 132 passed, 0 failed; 14 report cases verify
+  exact totals, empty inputs, range boundaries, rounding and generators.
+- Git commit: `feat: add workout and nutrition reports`.
+- What I learned: Student reflection pending; explain why returned results and
+  explicit metric definitions make reports easier to test and interpret.
+
 ## Publication status during development
 
 The Step 2 push returned `Cannot prompt because user interactivity has been
 disabled` / `unable to get password from user`. Commits `babd4ea` and `8d3da7a`
-were still local at that attempt. Development continues under the user's updated
+were still local at that attempt. The Step 3 push failed for the same reason;
+`e01b1fe` is also pending. Development continues under the user's updated
 instruction. Credentials are not modified; each stage attempts a normal push.
 The final audit will list all commits still awaiting manual publication.

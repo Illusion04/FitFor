@@ -9,7 +9,7 @@ On 22 October 2026 (session date), Codex ran:
 ```
 
 Environment: Python 3.12.10, pytest 9.1.1. Latest full-suite result:
-**118 passed, 0 failed** (models, validation and storage).
+**132 passed, 0 failed** (models, validation, storage and reports).
 All test entries are synthetic.
 Stage 1 originally passed 10 model tests; its results are retained below.
 
@@ -60,3 +60,18 @@ Full suite: 118 passed, 0 failed; 30 storage cases use temporary directories.
 | S06 | Invalid IDs/schema | Booleans, duplicate IDs, invalid fields and malformed JSON | Clear error; existing data not overwritten | Matched | Pass |
 | S07 | Invalid model | Set sets to zero before saving | Save rejected; existing bytes unchanged | Matched | Pass |
 | S08 | Write failure | Simulate failure during atomic replacement | Existing bytes retained; temporary file cleaned up | Matched | Pass |
+
+## Step 4: Reports
+
+Full suite: 132 passed, 0 failed; 14 report cases.
+
+| Test ID | Feature | Input/action | Expected result | Actual result | Pass/fail |
+| --- | --- | --- | --- | --- | --- |
+| R01 | Workout totals | Three entries across two dates, including an unknown load | 3 entries, 2 days, 2 exercise names, 7 sets, 54 reps, 500.0 volume | Matched | Pass |
+| R02 | Empty data | Empty workout/meal inputs | Zero totals and no daily groups | Matched | Pass |
+| R03 | Date filtering | Single-day and open-ended ranges | Inclusive boundaries; no out-of-range entries | Matched | Pass |
+| R04 | Load interpretation | Recorded zero load vs omitted load | Zero counted as recorded; missing load excluded | Matched | Pass |
+| R05 | Nutrition | Three synthetic meals | 820 kcal, 50 g protein, 100.75 g carbs, 22.5 g fat | Matched | Pass |
+| R06 | Daily totals | Unordered dates | Correct daily totals in ascending date order | Matched | Pass |
+| R07 | Invalid range | Start date after end date for all report APIs | Clear ValueError | Matched | Pass |
+| R08 | Numeric/input boundaries | Fractional nutrients and single-use iterators | Correct rounded totals; no lost entries | Matched | Pass |
