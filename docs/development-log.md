@@ -41,4 +41,23 @@ completed by the student in their own words.
 - What I learned: Student reflection pending; explain dataclass defaults,
   `int | None`, and why a calculated property avoids stale stored values.
 
-Later stages will be recorded when they are implemented and verified.
+## Step 2: Input validation
+
+- Date: 22 October 2026 (session date).
+- Task: Centralise date, text, integer, nutrient and optional-load validation.
+- Files changed: `fitfor/validation.py`, `tests/test_validation.py`, this log
+  and `docs/testing.md`.
+- What was implemented: Strict YYYY-MM-DD parsing, trimmed required/optional
+  text, positive sets/reps, non-negative integer calories, finite non-negative
+  nutrient values, and blank load handling. Errors name the offending field.
+- Problem encountered: Python treats booleans as integers, permits non-finite
+  floats, and accepts some ISO date forms outside the requested format.
+- How it was solved: Reject booleans, check finiteness, require the explicit
+  date pattern, and avoid truncating fractional integer inputs.
+- Tests performed: Full `python -m pytest -v` run: 88 passed, 0 failed.
+- Git commit: `feat: add input validation for workouts and meals`.
+- Repository note: Fetch succeeded after manual authentication. At inspection,
+  `origin/master` still pointed to `423ea17`; the normal push will also include
+  the existing Step 1 commit `babd4ea`.
+- What I learned: Student reflection pending; consider why parsing boundaries
+  need tests for types, formats and non-finite numbers.
