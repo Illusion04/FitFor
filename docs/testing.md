@@ -9,7 +9,7 @@ On 22 October 2026 (session date), Codex ran:
 ```
 
 Environment: Python 3.12.10, pytest 9.1.1. Latest full-suite result:
-**168 passed, 0 failed** (including entry-point and regression tests).
+**180 passed, 0 failed** (including privacy and safe-deletion tests).
 All test entries are synthetic.
 Stage 1 originally passed 10 model tests; its results are retained below.
 
@@ -122,3 +122,18 @@ full suite produced **168 passed, 0 failed**. No coverage tool was added.
 | A05 | Numeric overflow | Extreme load, huge set count and overflowing nutrient sum | Clear numeric-range ValueError | Failed initially; fixed and passed | Pass |
 | A06 | Meal retries | Invalid names, calories and each nutrient | Retry only invalid fields; save valid entry | Matched | Pass |
 | A07 | Report retries | Invalid date and reversed range | Explain error; accept corrected date range | Matched | Pass |
+
+## Step 8: Privacy and safe deletion
+
+Full suite: 180 passed, 0 failed; 12 additional privacy/control cases.
+
+| Test ID | Feature | Input/action | Expected result | Actual result | Pass/fail |
+| --- | --- | --- | --- | --- | --- |
+| P01 | Target review | Select each record type with a long name | Full date/name/ID precedes confirmation | Matched | Pass |
+| P02 | Explicit confirmation | Enter y with surrounding whitespace and uppercase | Only the selected record type is deleted | Matched | Pass |
+| P03 | Safe default | Enter n, N, yes, blank or invalid for a meal | Cancellation; both collections unchanged | Matched | Pass |
+| P04 | Interrupted confirmation | EOF/Ctrl+C for either record type | No deletion | Matched | Pass |
+| P05 | Privacy guidance | Choose menu option 9 | Human-risk guidance and actual login/encryption limitations displayed | Matched | Pass |
+
+The threat model and campaign document describe implemented controls and
+residual risks. Campaign effectiveness has not been measured.

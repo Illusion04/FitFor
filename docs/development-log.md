@@ -158,6 +158,24 @@ completed by the student in their own words.
 - What I learned: Student reflection pending; describe a failing regression
   case, the defect it revealed and how its passing rerun supports the fix.
 
+## Step 8: Privacy and deletion controls
+
+- Date: 22 October 2026 (session date).
+- Task: Connect genuine in-app privacy controls to the assessment threat model.
+- Files changed: `fitfor/cli.py`, `tests/test_privacy.py`,
+  `docs/threat-model.md`, `docs/privacy-campaign.md`, this log and testing notes.
+- What was implemented: Menu 9, Protect Your Progress guidance, full target
+  date/name/ID preview before permanent deletion, and explicit confirmation.
+- Problem encountered: Truncated table names are insufficient when deciding
+  which record to delete, and guidance must not imply encryption or a login.
+- How it was solved: Preview the full target before asking; cancel on every
+  non-y response or interruption. State actual privacy limitations clearly.
+- Tests performed: Full suite: 180 passed, 0 failed; 12 new privacy/control
+  cases verify preview order, target selection, cancellation and guidance.
+- Git commit: `feat: add privacy guidance and safe deletion controls`.
+- What I learned: Student reflection pending; relate the implemented controls
+  to human vulnerabilities and explain the residual risks in the threat table.
+
 ## Publication status during development
 
 The Step 2 push returned `Cannot prompt because user interactivity has been
@@ -166,6 +184,7 @@ were still local at that attempt. The Step 3 push failed for the same reason;
 `e01b1fe` is also pending. The Step 4 push also failed with that error, leaving
 `da6fa38` local. Step 5 push failed identically; `3b879ba` is pending too.
 The Step 6 push also failed identically; `2582d9e` is pending.
+The Step 7 push failed identically; `6f28841` is pending.
 Development continues under the user's updated
 instruction. Credentials are not modified; each stage attempts a normal push.
 The final audit will list all commits still awaiting manual publication.

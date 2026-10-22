@@ -30,7 +30,21 @@ FITFOR
 6. Delete meal
 7. Workout report
 8. Nutrition report
+9. Privacy and data guidance
 0. Exit
+"""
+
+PRIVACY_TEXT = """
+Protect Your Progress
+
+FitFor stores your workout and nutrition records locally.
+- Review the date, name and ID before confirming deletion.
+- Avoid passwords, financial details or medical information in notes.
+- Review files and screenshots before sharing your fitness data.
+- Store backups securely and restrict access to your account and data folder.
+
+Records are not encrypted and there is no application login.
+FitFor records information; it does not provide medical recommendations.
 """
 
 Value = TypeVar("Value")
@@ -73,6 +87,7 @@ class Menu:
             "6": lambda: self._delete("meal"),
             "7": self._workout_report,
             "8": self._nutrition_report,
+            "9": lambda: self.output(PRIVACY_TEXT),
         }
         try:
             while True:
@@ -179,10 +194,20 @@ class Menu:
             f"{kind.title()} ID to delete: ",
             lambda value: validate_positive_int(value, "ID"),
         )
-        if not any(entry.id == identifier for entry in entries):
+        entry = next((item for item in entries if item.id == identifier), None)
+        if entry is None:
             self.output(f"No {kind} found with ID {identifier}.")
             return
-        answer = self.input(f"Delete this {kind}? (y/n): ").strip().casefold()
+        self.output("You are about to permanently delete:")
+        self.output(f"{kind.title()} ID {identifier}:")
+        name = entry.exercise if isinstance(entry, Workout) else entry.food
+        self.output(f"{entry.log_date.isoformat()} - {name}")
+        if isinstance(entry, Workout):
+            load = "unrecorded" if entry.weight_kg is None else entry.weight_kg
+            self.output(f"Sets: {entry.sets}; reps: {entry.reps}; kg: {load}")
+        else:
+            self.output(f"Meal type: {entry.meal_type}; kcal: {entry.calories}")
+        answer = self.input("Continue? (y/n): ").strip().casefold()
         if answer != "y":
             self.output("Deletion cancelled.")
             return
