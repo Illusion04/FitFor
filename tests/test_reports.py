@@ -140,3 +140,21 @@ def test_fractional_nutrients_are_rounded_at_the_total():
 def test_generators_are_consumed_only_once(workouts, meals):
     assert workout_summary(iter(workouts)) == workout_summary(workouts)
     assert nutrition_summary(iter(meals)) == nutrition_summary(meals)
+
+
+@pytest.mark.parametrize("weight", [1e308, 1.0])
+def test_overflowing_workout_volume_has_a_clear_error(weight):
+    sets = 3 if weight == 1e308 else 10 ** 400
+    entries = [Workout(date(2026, 10, 22), "Sample exercise", sets, 8, weight)]
+
+    with pytest.raises(ValueError, match="numeric range"):
+        workout_summary(entries)
+
+
+@pytest.mark.parametrize("report", [nutrition_summary, daily_nutrition_summary])
+def test_overflowing_nutrient_totals_have_a_clear_error(report):
+    entries = [Meal(date(2026, 10, 22), "snack", "Sample food", 0, 1e308)
+               for _ in range(2)]
+
+    with pytest.raises(ValueError, match="numeric range"):
+        report(entries)

@@ -3,12 +3,23 @@
 from collections import defaultdict
 from collections.abc import Iterable
 from datetime import date
-from math import fsum
+from math import fsum, isfinite
 from typing import TypeVar
 
 from fitfor.models import Meal, Workout
 
 Entry = TypeVar("Entry", Workout, Meal)
+
+
+def _rounded_total(values: Iterable[float]) -> float:
+    message = "Recorded total exceeds the supported numeric range."
+    try:
+        total = fsum(values)
+    except OverflowError:
+        raise ValueError(message) from None
+    if not isfinite(total):
+        raise ValueError(message)
+    return round(total, 2)
 
 
 def _in_period(
@@ -28,7 +39,12 @@ def workout_summary(
 ) -> dict[str, int | float]:
     """Summarise exercise entries; recorded volume excludes unknown loads."""
     entries = _in_period(workouts, start, end)
-    volumes = [entry.volume for entry in entries if entry.volume is not None]
+    try:
+        volumes = [entry.volume for entry in entries if entry.volume is not None]
+    except OverflowError:
+        raise ValueError(
+            "Recorded volume exceeds the supported numeric range."
+        ) from None
     return {
         "workout_entries": len(entries),
         "workout_days": len({entry.log_date for entry in entries}),
@@ -37,7 +53,7 @@ def workout_summary(
         "total_reps": sum(entry.sets * entry.reps for entry in entries),
         "entries_with_load": len(volumes),
         "entries_without_load": len(entries) - len(volumes),
-        "recorded_volume": round(fsum(volumes), 2),
+        "recorded_volume": _rounded_total(volumes),
     }
 
 
@@ -51,9 +67,9 @@ def nutrition_summary(
     return {
         "meal_entries": len(entries),
         "total_calories": sum(entry.calories for entry in entries),
-        "total_protein_g": round(fsum(entry.protein_g for entry in entries), 2),
-        "total_carbs_g": round(fsum(entry.carbs_g for entry in entries), 2),
-        "total_fat_g": round(fsum(entry.fat_g for entry in entries), 2),
+        "total_protein_g": _rounded_total(entry.protein_g for entry in entries),
+        "total_carbs_g": _rounded_total(entry.carbs_g for entry in entries),
+        "total_fat_g": _rounded_total(entry.fat_g for entry in entries),
     }
 
 

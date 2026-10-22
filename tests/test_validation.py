@@ -81,7 +81,8 @@ def test_non_negative_numbers(value):
 
 @pytest.mark.parametrize(
     "value", [-1, "-0.1", "", "word", "nan", "inf", "-inf", "1e999",
-              float("nan"), float("inf"), True, None, [], 10 ** 400],
+              float("nan"), float("inf"), True, None, [],
+              pytest.param(10 ** 400, id="overflowing-integer")],
 )
 def test_invalid_non_negative_numbers(value):
     with pytest.raises(ValueError, match="Protein.*finite, non-negative"):

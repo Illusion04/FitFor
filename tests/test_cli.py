@@ -149,3 +149,32 @@ def test_interrupted_add_does_not_save_a_partial_record(tmp_path, error_type):
 
     assert storage.load_workouts() == []
     assert "Exiting FitFor." in "\n".join(output)
+
+
+def test_meal_fields_retry_invalid_values(tmp_path):
+    storage = Storage(tmp_path / "records.json")
+    output = run_cli(storage, [
+        "4", "2026-10-22", "", "lunch", " ", "Sample wrap",
+        "-1", "520", "nan", "35", "-2", "60.5", "inf", "15", "", "0",
+    ])
+
+    assert output.count("Invalid input") == 6
+    assert len(storage.load_meals()) == 1
+    assert storage.load_meals()[0].protein_g == 35.0
+    assert storage.load_meals()[0].fat_g == 15.0
+
+
+def test_report_retries_invalid_dates_and_reversed_range(tmp_path):
+    storage = Storage(tmp_path / "records.json")
+    storage.add_workout(
+        Workout(date(2026, 10, 22), "Sample exercise", 1, 1, 2.0),
+    )
+
+    output = run_cli(storage, [
+        "7", "invalid date", "2026-10-23", "2026-10-22",
+        "2026-10-22", "2026-10-22", "0",
+    ])
+
+    assert "Invalid input" in output
+    assert "Start date must be on or before end date." in output
+    assert "Recorded volume (kg x reps): 2.0" in output

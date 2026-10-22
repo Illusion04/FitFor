@@ -27,6 +27,15 @@ class StorageError(Exception):
     """A storage operation failed without deliberately discarding records."""
 
 
+def _unique_object(pairs: list[tuple[str, object]]) -> dict:
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"Duplicate JSON key: {key}.")
+        result[key] = value
+    return result
+
+
 def _stored_int(value: object, name: str, *, positive: bool = False) -> int:
     if type(value) is not int:
         raise ValueError(f"{name} must be stored as an integer.")
@@ -111,7 +120,7 @@ class Storage:
         if not text.strip():
             return {"workouts": [], "meals": []}
         try:
-            data = json.loads(text)
+            data = json.loads(text, object_pairs_hook=_unique_object)
         except ValueError as error:
             raise StorageError(
                 f"Invalid JSON in {self.path}; the file was left unchanged."

@@ -182,3 +182,79 @@ def test_failed_replacement_preserves_existing_file(
 
     assert path.read_bytes() == before
     assert sorted(item.name for item in tmp_path.iterdir()) == ["records.json"]
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [("calories", -1), ("calories", 1.5), ("protein_g", -0.1),
+     ("carbs_g", "2"), ("fat_g", float("inf")), ("food", ""),
+     ("meal_type", None)],
+)
+def test_invalid_meal_blocks_saves_without_losing_data(
+    tmp_path, workout, meal, field, value,
+):
+    raw = asdict(meal)
+    raw.update(id=1, log_date="2026-10-22")
+    raw[field] = value
+    path = tmp_path / "records.json"
+    path.write_text(json.dumps({"workouts": [], "meals": [raw]}),
+                    encoding="utf-8")
+    before = path.read_bytes()
+
+    with pytest.raises(StorageError):
+        Storage(path).add_workout(workout)
+    assert path.read_bytes() == before
+
+
+def test_invalid_utf8_is_reported_and_preserved(tmp_path, workout):
+    path = tmp_path / "records.json"
+    path.write_bytes(b"\xff\xfeinvalid")
+
+    with pytest.raises(StorageError, match="Cannot read"):
+        Storage(path).add_workout(workout)
+    assert path.read_bytes() == b"\xff\xfeinvalid"
+
+
+def test_directory_cannot_be_used_as_a_data_file(tmp_path):
+    with pytest.raises(StorageError, match="Cannot read"):
+        Storage(tmp_path).load_workouts()
+
+
+def test_read_permission_error_is_reported(tmp_path, monkeypatch, workout):
+    path = tmp_path / "records.json"
+    storage = Storage(path)
+    storage.add_workout(workout)
+    before = path.read_bytes()
+
+    def fail_read(*args, **kwargs):
+        raise PermissionError("Synthetic read failure")
+
+    monkeypatch.setattr(type(path), "read_text", fail_read)
+    with pytest.raises(StorageError, match="Cannot read"):
+        storage.load_workouts()
+    assert path.read_bytes() == before
+
+
+def test_string_date_on_a_model_is_not_silently_saved(tmp_path, workout):
+    workout.log_date = "2026-10-22"
+    path = tmp_path / "records.json"
+
+    with pytest.raises(StorageError, match="date object"):
+        Storage(path).add_workout(workout)
+    assert not path.exists()
+
+
+@pytest.mark.parametrize(
+    "text", ['{"workouts": [], "meals": [], "meals": []}',
+             '{"workouts": [], "meals": [], "workouts": []}'],
+)
+def test_duplicate_json_keys_are_rejected_without_overwriting(
+    tmp_path, workout, text,
+):
+    path = tmp_path / "records.json"
+    path.write_text(text, encoding="utf-8")
+    before = path.read_bytes()
+
+    with pytest.raises(StorageError):
+        Storage(path).add_workout(workout)
+    assert path.read_bytes() == before

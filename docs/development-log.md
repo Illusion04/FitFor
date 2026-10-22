@@ -140,6 +140,24 @@ completed by the student in their own words.
 - What I learned: Student reflection pending; explain the main guard and why
   test storage must be separate from normal records.
 
+## Step 7: Automated test audit
+
+- Date: 22 October 2026 (session date).
+- Task: Audit coverage of required behaviour and add useful boundary cases.
+- Files changed: Storage/report modules and tests, CLI/validation tests, this
+  log and `docs/testing.md`. Step 1 models were not changed.
+- What was implemented: Additional checks for invalid meal records, UTF-8 and
+  read errors, duplicate JSON keys, report overflow and CLI retries.
+- Problem encountered: The expanded run exposed six failures: duplicate keys
+  were accepted silently and extreme totals returned infinity or OverflowError.
+- How it was solved: Reject duplicate JSON keys during parsing and translate
+  report overflow/non-finite totals into clear ValueError messages.
+- Tests performed: Initial expanded run: 162 passed, 6 failed. After fixes:
+  168 passed, 0 failed. No coverage dependency was added.
+- Git commit: `test: expand automated FitFor test coverage`.
+- What I learned: Student reflection pending; describe a failing regression
+  case, the defect it revealed and how its passing rerun supports the fix.
+
 ## Publication status during development
 
 The Step 2 push returned `Cannot prompt because user interactivity has been
@@ -147,6 +165,7 @@ disabled` / `unable to get password from user`. Commits `babd4ea` and `8d3da7a`
 were still local at that attempt. The Step 3 push failed for the same reason;
 `e01b1fe` is also pending. The Step 4 push also failed with that error, leaving
 `da6fa38` local. Step 5 push failed identically; `3b879ba` is pending too.
+The Step 6 push also failed identically; `2582d9e` is pending.
 Development continues under the user's updated
 instruction. Credentials are not modified; each stage attempts a normal push.
 The final audit will list all commits still awaiting manual publication.

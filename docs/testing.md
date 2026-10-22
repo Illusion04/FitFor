@@ -9,7 +9,7 @@ On 22 October 2026 (session date), Codex ran:
 ```
 
 Environment: Python 3.12.10, pytest 9.1.1. Latest full-suite result:
-**149 passed, 0 failed** (including entry-point subprocess tests).
+**168 passed, 0 failed** (including entry-point and regression tests).
 All test entries are synthetic.
 Stage 1 originally passed 10 model tests; its results are retained below.
 
@@ -106,3 +106,19 @@ Full suite: 149 passed, 0 failed; three entry-point subprocess tests.
 
 The live meal table wrapped at 80 columns; compact display is recorded for
 the final cleanup stage. No error occurred and data values were correct.
+
+## Step 7: Test audit and regression fixes
+
+The expanded run initially produced **162 passed, 6 failed**. Two duplicate-key
+cases and four numeric-overflow cases exposed defects. After the fixes, the
+full suite produced **168 passed, 0 failed**. No coverage tool was added.
+
+| Test ID | Feature | Input/action | Expected result | Actual result | Pass/fail |
+| --- | --- | --- | --- | --- | --- |
+| A01 | Meal corruption | Negative nutrients/calories, wrong types, empty names | Save blocked; existing bytes unchanged | Matched | Pass |
+| A02 | Unreadable storage | Invalid UTF-8, directory path and simulated denied read | Clear StorageError; no reset | Matched | Pass |
+| A03 | Model date type | Try saving a string instead of date | Rejected before file creation | Matched | Pass |
+| A04 | Duplicate JSON keys | Repeated collection keys | Reject and preserve original bytes | Failed initially; fixed and passed | Pass |
+| A05 | Numeric overflow | Extreme load, huge set count and overflowing nutrient sum | Clear numeric-range ValueError | Failed initially; fixed and passed | Pass |
+| A06 | Meal retries | Invalid names, calories and each nutrient | Retry only invalid fields; save valid entry | Matched | Pass |
+| A07 | Report retries | Invalid date and reversed range | Explain error; accept corrected date range | Matched | Pass |
