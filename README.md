@@ -168,6 +168,9 @@ Project type: Python mini-project
 - [Development log](docs/development-log.md): implementation activity, problems,
   tests and commit subjects; student reflection is clearly left pending.
 - [Testing document](docs/testing.md): expected/actual results and live checks.
+- [Captured pytest output](docs/pytest-results.txt) and
+  [live smoke-test transcript](docs/final-smoke-test.txt): actual final runs
+  operated by Codex, using synthetic data.
 - [Threat model](docs/threat-model.md): technical and human vulnerabilities,
   implemented controls and residual risks.
 - [Protect Your Progress campaign](docs/privacy-campaign.md): in-app messages

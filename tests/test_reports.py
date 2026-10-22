@@ -151,7 +151,9 @@ def test_overflowing_workout_volume_has_a_clear_error(weight):
         workout_summary(entries)
 
 
-@pytest.mark.parametrize("report", [nutrition_summary, daily_nutrition_summary])
+@pytest.mark.parametrize(
+    "report", [nutrition_summary, daily_nutrition_summary],
+)
 def test_overflowing_nutrient_totals_have_a_clear_error(report):
     entries = [Meal(date(2026, 10, 22), "snack", "Sample food", 0, 1e308)
                for _ in range(2)]

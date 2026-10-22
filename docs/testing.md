@@ -9,7 +9,7 @@ On 22 October 2026 (session date), Codex ran:
 ```
 
 Environment: Python 3.12.10, pytest 9.1.1. Latest full-suite result:
-**180 passed, 0 failed** (including privacy and safe-deletion tests).
+**182 passed, 0 failed** (final full suite).
 All test entries are synthetic.
 Stage 1 originally passed 10 model tests; its results are retained below.
 
@@ -28,10 +28,15 @@ Stage 1 originally passed 10 model tests; its results are retained below.
 
 ## Manual evidence
 
-Live terminal checks after Steps 5–6 verified invalid choice handling, exit,
-and both complete add/view/report/delete workflows through `main.py`.
-The isolated synthetic smoke file was removed afterwards. No screenshots
-have been captured.
+Live terminal checks after Steps 5–6 and 10 verified both complete
+add/view/report/delete workflows through `main.py`, date filtering, invalid
+input retries, privacy guidance, cancelled deletions, empty views and exit.
+Isolated synthetic smoke files were removed afterwards. No screenshots have
+been captured. The final live session was operated by Codex, not claimed as
+student-authored manual evidence.
+
+Actual captured output: [pytest results](pytest-results.txt) and
+[final smoke-test transcript](final-smoke-test.txt).
 
 ## Step 2: Validation
 
@@ -104,8 +109,8 @@ Full suite: 149 passed, 0 failed; three entry-point subprocess tests.
 | E04 | Live workout flow | Add 3 × 8 × 12.5, view, report, confirm deletion | Displayed entry, 300.0 volume, successful delete | Observed | Pass |
 | E05 | Live meal flow | Add 520 kcal, 35 g protein, 60.5 g carbs, 15 g fat; view/report/delete | Correct entry and nutrient totals; successful delete | Observed | Pass |
 
-The live meal table wrapped at 80 columns; compact display is recorded for
-the final cleanup stage. No error occurred and data values were correct.
+The Step 6 live meal table wrapped at 80 columns. This was resolved and
+verified with a compact display in Step 10.
 
 ## Step 7: Test audit and regression fixes
 
@@ -147,3 +152,34 @@ for this stage and no tests were added merely to mirror documentation text.
 | --- | --- | --- | --- | --- | --- |
 | D01 | README accuracy | Compare instructions/features with source and earlier live checks | Reproducible commands; implemented features only | Reviewed and matched | Pass |
 | D02 | Evidence provenance | Review assessment checklist and linked documents | Personal reflection, screenshots and external assessment tasks left pending | Matched | Pass |
+
+## Step 10: Final audit and live smoke test
+
+The final full suite passed **182 tests, 0 failed**. Two new regression tests
+cover full names in views and safe rejection of deeply nested storage. The
+first cleanup run passed 181 tests with one over-specific error-message
+assertion failure; correcting that assertion produced the final passing run.
+
+The following were observed in a real terminal session using a newly created
+synthetic data file, then repeated default startup/exit. The actual transcript
+is retained; no screenshots or user feedback are fabricated.
+
+| Test ID | Feature | Input/action | Expected result | Actual result | Pass/fail |
+| --- | --- | --- | --- | --- | --- |
+| F01 | Invalid menu choice | Enter invalid | Explain and show menu again | Observed | Pass |
+| F02 | Invalid date/sets | Enter 2026-02-29 and sets 0, then correct them | Reject invalid values and retry fields | Observed | Pass |
+| F03 | Workout add/view/report | Add 3 × 8 × 12.5 on 2026-10-22; filter to that date | Saved ID 1; 24 reps; volume 300.0 | Observed | Pass |
+| F04 | Meal add/view/report | Add 520 kcal, 35/60.5/15 g nutrients; filter to date | Correct entry, total and daily values | Observed | Pass |
+| F05 | Meal display | View the sample meal in an 80-column terminal | Table/nutrient details fit without the prior wrapping | Observed | Pass |
+| F06 | Privacy guidance | Choose 9 | Protect Your Progress messages and actual limitations | Observed | Pass |
+| F07 | Cancel workout deletion | Inspect preview; enter n; view again | Record remains | Observed | Pass |
+| F08 | Invalid meal confirmation | Inspect preview; enter invalid; view again | Record remains | Observed | Pass |
+| F09 | Confirm deletion | Preview each record and enter y | Only target deleted; both final views empty | Observed | Pass |
+| F10 | Exit/default startup | Enter 0; separately launch main.py normally and exit | Goodbye; return code 0 | Observed | Pass |
+| F11 | Full-name/deep-data regressions | Run new automated tests | Full names available; invalid nested storage preserved | Matched | Pass |
+| F12 | Repository hygiene | Inspect tracked files and check-ignore output | No runtime/private data, environments or caches tracked | Matched | Pass |
+| F13 | Step 1 preservation | Compare model code/tests to babd4ea | No changes | Matched | Pass |
+
+Screenshots and personal learning reflections remain student actions. The
+threat table covers controls and residual risks; it is not a claim that the
+application is fully secure or that campaign effectiveness was measured.

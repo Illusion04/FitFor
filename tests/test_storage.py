@@ -40,7 +40,9 @@ def test_empty_storage_is_safe(tmp_path, text):
     assert Storage(path).load_meals() == []
 
 
-def test_save_reload_both_collections_and_preserve_dates(tmp_path, workout, meal):
+def test_save_reload_both_collections_and_preserve_dates(
+    tmp_path, workout, meal,
+):
     path = tmp_path / "nested" / "records.json"
     storage = Storage(path)
     saved_workout = storage.add_workout(workout)
@@ -78,7 +80,9 @@ def test_unrecorded_load_round_trips_as_null(tmp_path):
     assert saved.volume is None
 
 
-def test_deletion_targets_only_the_selected_collection(tmp_path, workout, meal):
+def test_deletion_targets_only_the_selected_collection(
+    tmp_path, workout, meal,
+):
     storage = Storage(tmp_path / "records.json")
     storage.add_workout(workout)
     remaining = storage.add_workout(workout)
@@ -111,7 +115,9 @@ def test_invalid_delete_id_does_not_change_storage(
              '{"workouts": [null], "meals": []}',
              '{"workouts": [], "meals": [], "unknown": 1}'],
 )
-def test_corrupt_storage_is_reported_and_not_overwritten(tmp_path, workout, text):
+def test_corrupt_storage_is_reported_and_not_overwritten(
+    tmp_path, workout, text,
+):
     path = tmp_path / "records.json"
     path.write_text(text, encoding="utf-8")
     before = path.read_bytes()
@@ -122,6 +128,16 @@ def test_corrupt_storage_is_reported_and_not_overwritten(tmp_path, workout, text
     with pytest.raises(StorageError):
         storage.add_workout(workout)
     assert path.read_bytes() == before
+
+
+def test_excessively_nested_json_is_reported_and_preserved(tmp_path, workout):
+    path = tmp_path / "records.json"
+    text = "[" * 2000 + "0" + "]" * 2000
+    path.write_text(text, encoding="utf-8")
+
+    with pytest.raises(StorageError):
+        Storage(path).add_workout(workout)
+    assert path.read_text(encoding="utf-8") == text
 
 
 @pytest.mark.parametrize(

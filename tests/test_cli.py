@@ -178,3 +178,18 @@ def test_report_retries_invalid_dates_and_reversed_range(tmp_path):
     assert "Invalid input" in output
     assert "Start date must be on or before end date." in output
     assert "Recorded volume (kg x reps): 2.0" in output
+
+
+def test_views_show_full_names_when_table_cells_are_truncated(tmp_path):
+    storage = Storage(tmp_path / "records.json")
+    exercise = "Sample exercise with a long descriptive name"
+    food = "Sample food with a long descriptive name"
+    meal_type = "Sample extended meal type"
+    storage.add_workout(Workout(date(2026, 10, 22), exercise, 1, 1))
+    storage.add_meal(Meal(date(2026, 10, 22), meal_type, food, 0, 0.0))
+
+    output = run_cli(storage, ["2", "5", "0"])
+
+    assert exercise in output
+    assert food in output
+    assert meal_type in output

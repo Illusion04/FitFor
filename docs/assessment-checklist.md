@@ -4,6 +4,7 @@
 
 - [x] Modular CLI with local workout/meal persistence and reports.
 - [x] Synthetic automated tests and recorded expected/actual results.
+- [x] Actual final pytest output and agent-operated live terminal transcript.
 - [x] Development activity log with meaningful incremental commit subjects.
 - [x] Threat table with explicit human vulnerabilities and residual risks.
 - [x] Protect Your Progress awareness content connected to in-app controls.

@@ -39,8 +39,9 @@ def _unique_object(pairs: list[tuple[str, object]]) -> dict:
 def _stored_int(value: object, name: str, *, positive: bool = False) -> int:
     if type(value) is not int:
         raise ValueError(f"{name} must be stored as an integer.")
-    validator = validate_positive_int if positive else validate_non_negative_int
-    return validator(value, name)
+    if positive:
+        return validate_positive_int(value, name)
+    return validate_non_negative_int(value, name)
 
 
 def _stored_number(value: object, name: str) -> float:
@@ -78,7 +79,9 @@ def _decode_record(raw: object, model: type[Entry]) -> Entry:
                 values[name] = _stored_number(raw.get(name, 0.0), name)
         return model(**values)
     except (KeyError, TypeError, ValueError) as error:
-        raise StorageError(f"Invalid {model.__name__} record: {error}") from error
+        raise StorageError(
+            f"Invalid {model.__name__} record: {error}"
+        ) from error
 
 
 def _encode_record(entry: Workout | Meal) -> dict:
@@ -121,7 +124,7 @@ class Storage:
             return {"workouts": [], "meals": []}
         try:
             data = json.loads(text, object_pairs_hook=_unique_object)
-        except ValueError as error:
+        except (ValueError, RecursionError) as error:
             raise StorageError(
                 f"Invalid JSON in {self.path}; the file was left unchanged."
             ) from error
@@ -175,7 +178,7 @@ class Storage:
         return saved
 
     def add_workout(self, workout: Workout) -> Workout:
-        """Save an exercise entry with an assigned ID; return the saved copy."""
+        """Save an exercise and return a copy with its assigned ID."""
         return self._add(workout, "workouts")
 
     def add_meal(self, meal: Meal) -> Meal:
@@ -193,9 +196,9 @@ class Storage:
         return True
 
     def delete_workout(self, identifier: int) -> bool:
-        """Delete an exercise by ID; UI callers must obtain confirmation first."""
+        """Delete an exercise by ID after the UI has obtained confirmation."""
         return self._delete(identifier, "workouts")
 
     def delete_meal(self, identifier: int) -> bool:
-        """Delete a food entry by ID; UI callers must obtain confirmation first."""
+        """Delete a meal by ID after the UI has obtained confirmation."""
         return self._delete(identifier, "meals")

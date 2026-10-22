@@ -77,7 +77,7 @@ class Menu:
         )
 
     def run(self) -> None:
-        """Run until exit, EOF or Ctrl+C, handling expected user/storage errors."""
+        """Run until exit or interruption, handling expected errors."""
         actions = {
             "1": self._add_workout,
             "2": self._view_workouts,
@@ -98,7 +98,9 @@ class Menu:
                     return
                 action = actions.get(choice)
                 if action is None:
-                    self.output("Invalid choice. Enter one of the menu numbers.")
+                    self.output(
+                        "Invalid choice. Enter one of the menu numbers."
+                    )
                     continue
                 try:
                     action()
@@ -155,13 +157,17 @@ class Menu:
             f"{'Sets':>4} {'Reps':>4} {'kg':>9} {'Volume':>12}"
         )
         for entry in entries:
-            weight = "-" if entry.weight_kg is None else f"{entry.weight_kg:.2f}"
+            weight = (
+                "-" if entry.weight_kg is None else f"{entry.weight_kg:.2f}"
+            )
             volume = "-" if entry.volume is None else f"{entry.volume:.2f}"
             self.output(
                 f"{entry.id:>4}  {entry.log_date.isoformat()}  "
                 f"{entry.exercise:<24.24}  {entry.sets:>4} {entry.reps:>4} "
                 f"{weight:>9} {volume:>12}"
             )
+            if len(entry.exercise) > 24:
+                self.output(f"  Exercise: {entry.exercise}")
             if entry.notes:
                 self.output(f"  Notes: {entry.notes}")
 
@@ -171,15 +177,19 @@ class Menu:
             self.output("No meals recorded.")
             return
         self.output(
-            f"{'ID':>4}  {'Date':10}  {'Type':10} {'Food':22} "
-            f"{'kcal':>7} {'Protein g':>10} {'Carbs g':>10} {'Fat g':>10}"
+            f"{'ID':>4}  {'Date':10}  {'Type':10} {'Food':22} {'kcal':>7}"
         )
         for entry in entries:
             self.output(
                 f"{entry.id:>4}  {entry.log_date.isoformat()}  "
                 f"{entry.meal_type:<10.10} {entry.food:<22.22} "
-                f"{entry.calories:>7} {entry.protein_g:>10.2f} "
-                f"{entry.carbs_g:>10.2f} {entry.fat_g:>10.2f}"
+                f"{entry.calories:>7}"
+            )
+            if len(entry.meal_type) > 10 or len(entry.food) > 22:
+                self.output(f"  Meal: {entry.meal_type} - {entry.food}")
+            self.output(
+                f"  Protein: {entry.protein_g:.2f} g | "
+                f"Carbs: {entry.carbs_g:.2f} g | Fat: {entry.fat_g:.2f} g"
             )
             if entry.notes:
                 self.output(f"  Notes: {entry.notes}")
@@ -206,7 +216,9 @@ class Menu:
             load = "unrecorded" if entry.weight_kg is None else entry.weight_kg
             self.output(f"Sets: {entry.sets}; reps: {entry.reps}; kg: {load}")
         else:
-            self.output(f"Meal type: {entry.meal_type}; kcal: {entry.calories}")
+            self.output(
+                f"Meal type: {entry.meal_type}; kcal: {entry.calories}"
+            )
         answer = self.input("Continue? (y/n): ").strip().casefold()
         if answer != "y":
             self.output("Deletion cancelled.")
@@ -246,7 +258,9 @@ class Menu:
         }
         for key, label in labels.items():
             self.output(f"{label}: {summary[key]}")
-        self.output("Volume = sets x reps x recorded kg; unknown loads excluded.")
+        self.output(
+            "Volume = sets x reps x recorded kg; unknown loads excluded."
+        )
 
     def _nutrition_report(self) -> None:
         start, end = self._period()

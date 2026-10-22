@@ -12,11 +12,12 @@ from tests.test_cli import run_cli
 
 def seed(storage):
     workout = storage.add_workout(Workout(
-        date(2026, 10, 22), "Sample exercise with a long descriptive name", 3, 8,
+        date(2026, 10, 22),
+        "Sample exercise with a long descriptive name", 3, 8,
     ))
     meal = storage.add_meal(Meal(
-        date(2026, 10, 22), "lunch", "Sample food with a long descriptive name",
-        520, 35.0,
+        date(2026, 10, 22), "lunch",
+        "Sample food with a long descriptive name", 520, 35.0,
     ))
     return workout, meal
 
@@ -81,7 +82,8 @@ def test_privacy_menu_explains_human_risks_and_actual_limits(tmp_path):
 
     assert "Protect Your Progress" in output
     assert "Review the date, name and ID" in output
-    assert "Avoid passwords, financial details or medical information" in output
+    warning = "Avoid passwords, financial details or medical information"
+    assert warning in output
     assert "before sharing" in output
     assert "Store backups securely" in output
     assert "not encrypted" in output

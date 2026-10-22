@@ -13,7 +13,10 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="FitFor workout and meal log")
     parser.add_argument(
         "--data-file", type=Path, default=DEFAULT_DATA_PATH,
-        help="JSON storage path (default: data/fitfor_data.json in the project)",
+        help=(
+            "JSON storage path "
+            "(default: data/fitfor_data.json in the project)"
+        ),
     )
     arguments = parser.parse_args(argv)
     Menu(Storage(arguments.data_file)).run()

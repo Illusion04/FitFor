@@ -19,8 +19,8 @@ the same review-before-action message at the point of use.
 ## Evaluation and evidence
 
 Automated tests verify that the guidance is reachable and that confirmation
-controls preserve records on cancellation or interruption. A live final
-smoke test is recorded separately in `docs/testing.md` when performed.
+controls preserve records on cancellation or interruption. The actual final
+live check is recorded in `docs/testing.md` and `docs/final-smoke-test.txt`.
 
 Campaign reach, comprehension and behaviour change have not been measured.
 Screenshots and any assessment evaluation must come from real use; no survey

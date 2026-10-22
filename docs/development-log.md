@@ -194,16 +194,62 @@ completed by the student in their own words.
 - What I learned: Student reflection pending; explain how truthful limitations
   and reproducible instructions support professional software documentation.
 
+## Step 10: Final cleanup and smoke testing
+
+- Date: 22 October 2026 (session date).
+- Task: Audit the repository, fix observed display defects and verify the
+  completed application without changing its architecture.
+- Files changed: CLI/storage/report presentation and error handling, package
+  docstring, entry-point formatting, relevant tests and assessment evidence.
+  Step 1 model code and tests remain unchanged from `babd4ea`.
+- What was implemented: Compact meal rows, full-name details beneath truncated
+  table cells, nested-JSON error handling and wrapped Python lines. Actual
+  final output is deliberately included as assessment evidence in
+  `docs/pytest-results.txt` and `docs/final-smoke-test.txt`; runtime JSON is not.
+- Problem encountered: The live 80-column meal table wrapped, and table
+  truncation hid long names. A new nested-data test initially required a parser
+  message even though schema validation had safely rejected the file.
+- How it was solved: Move nutrients to a detail line, show full long names and
+  test the storage-error/preservation contract without prescribing the layer.
+- Tests performed: Final full suite: 182 passed, 0 failed. The earlier cleanup
+  run had 181 passed and one over-specific assertion failure, corrected before
+  commit. Final live checks passed both CRUD/report flows, invalid input,
+  privacy guidance, cancellation, explicit deletion, empty views and exit.
+  Default `main.py` startup/exit also passed. Both isolated smoke files were
+  removed after checking that their synthetic collections were empty.
+- Repository audit: Tracked files contain no environment, caches, secrets or
+  runtime data. Ignore rules cover the environment, caches, `.env` and `data/`.
+  Python source/test lines are at most 79 characters. No dependencies added,
+  branches renamed, history rewritten or credentials changed.
+- Git commit: `chore: prepare FitFor for final PFD200 assessment`.
+- What I learned: Student reflection pending; discuss final verification,
+  evidence provenance and remaining single-writer/plain-text storage limits.
+
 ## Publication status during development
 
-The Step 2 push returned `Cannot prompt because user interactivity has been
-disabled` / `unable to get password from user`. Commits `babd4ea` and `8d3da7a`
-were still local at that attempt. The Step 3 push failed for the same reason;
-`e01b1fe` is also pending. The Step 4 push also failed with that error, leaving
-`da6fa38` local. Step 5 push failed identically; `3b879ba` is pending too.
-The Step 6 push also failed identically; `2582d9e` is pending.
-The Step 7 push failed identically; `6f28841` is pending.
-The Step 8 push failed identically; `5385e8b` is pending.
-Development continues under the user's updated
-instruction. Credentials are not modified; each stage attempts a normal push.
-The final audit will list all commits still awaiting manual publication.
+Read-only fetch succeeded. All normal push attempts in Steps 2–9 returned:
+
+```text
+fatal: Cannot prompt because user interactivity has been disabled.
+fatal: unable to get password from user
+```
+
+The last refreshed `origin/master` was `423ea17`. Before the final cleanup
+commit, these implementation commits were pending publication:
+
+```text
+babd4ea feat: add Workout and Meal models
+8d3da7a feat: add input validation for workouts and meals
+e01b1fe feat: add persistent JSON storage
+da6fa38 feat: add workout and nutrition reports
+3b879ba feat: add interactive FitFor CLI menu
+2582d9e feat: add FitFor application entry point
+6f28841 test: expand automated FitFor test coverage
+5385e8b feat: add privacy guidance and safe deletion controls
+1680f5f docs: complete FitFor project documentation
+```
+
+The final cleanup commit also receives a normal push attempt; its outcome and
+hash are reported in the session handoff. Obtain the current complete pending
+list with `git log --oneline origin/master..HEAD`. Development continued under
+the user's updated instruction; credentials and history were not modified.

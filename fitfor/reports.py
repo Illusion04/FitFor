@@ -40,7 +40,11 @@ def workout_summary(
     """Summarise exercise entries; recorded volume excludes unknown loads."""
     entries = _in_period(workouts, start, end)
     try:
-        volumes = [entry.volume for entry in entries if entry.volume is not None]
+        volumes = []
+        for entry in entries:
+            volume = entry.volume
+            if volume is not None:
+                volumes.append(volume)
     except OverflowError:
         raise ValueError(
             "Recorded volume exceeds the supported numeric range."
@@ -48,7 +52,9 @@ def workout_summary(
     return {
         "workout_entries": len(entries),
         "workout_days": len({entry.log_date for entry in entries}),
-        "unique_exercises": len({entry.exercise.casefold() for entry in entries}),
+        "unique_exercises": len({
+            entry.exercise.casefold() for entry in entries
+        }),
         "total_sets": sum(entry.sets for entry in entries),
         "total_reps": sum(entry.sets * entry.reps for entry in entries),
         "entries_with_load": len(volumes),
@@ -67,7 +73,9 @@ def nutrition_summary(
     return {
         "meal_entries": len(entries),
         "total_calories": sum(entry.calories for entry in entries),
-        "total_protein_g": _rounded_total(entry.protein_g for entry in entries),
+        "total_protein_g": _rounded_total(
+            entry.protein_g for entry in entries
+        ),
         "total_carbs_g": _rounded_total(entry.carbs_g for entry in entries),
         "total_fat_g": _rounded_total(entry.fat_g for entry in entries),
     }

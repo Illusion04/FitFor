@@ -1,0 +1,361 @@
+FitFor final live smoke-test transcript
+Session date: 22 October 2026
+Operator: Codex, agent-operated live terminal session
+Synthetic inputs only. Terminal controls and trailing padding removed.
+This is captured text evidence, not a screenshot or student-authored record.
+The isolated synthetic data file was empty after deletion and removed.
+
+Command: .\.venv\Scripts\python.exe main.py --data-file data\final-smoke.json
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: invalid
+Invalid choice. Enter one of the menu numbers.
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 1
+Date (YYYY-MM-DD): 2026-02-29
+Invalid input: Date must be a valid calendar date in YYYY-MM-DD format.
+Date (YYYY-MM-DD): 2026-10-22
+Exercise: Sample press
+Sets: 0
+Invalid input: Sets must be a positive integer.
+Sets: 3
+Reps per set: 8
+Weight in kg (blank if unrecorded): 12.5
+Notes (optional): Synthetic final smoke
+Workout saved with ID 1.
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 2
+  ID  Date        Exercise                  Sets Reps        kg       Volume
+   1  2026-10-22  Sample press                 3    8     12.50       300.00
+  Notes: Synthetic final smoke
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 7
+Start date (YYYY-MM-DD, blank for all): 2026-10-22
+End date (YYYY-MM-DD, blank for all): 2026-10-22
+Exercise entries: 1
+Recorded workout days: 1
+Unique exercises: 1
+Total sets: 3
+Total repetitions across sets: 24
+Entries with recorded load: 1
+Entries without recorded load: 0
+Recorded volume (kg x reps): 300.0
+Volume = sets x reps x recorded kg; unknown loads excluded.
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 4
+Date (YYYY-MM-DD): 2026-10-22
+Meal type: lunch
+Food: Sample wrap
+Calories (kcal): 520
+Protein (g): 35
+Carbohydrates (g): 60.5
+Fat (g): 15
+Notes (optional): Synthetic final smoke
+Meal saved with ID 1.
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 5
+  ID  Date        Type       Food                      kcal
+   1  2026-10-22  lunch      Sample wrap                520
+  Protein: 35.00 g | Carbs: 60.50 g | Fat: 15.00 g
+  Notes: Synthetic final smoke
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 8
+Start date (YYYY-MM-DD, blank for all): 2026-10-22
+End date (YYYY-MM-DD, blank for all): 2026-10-22
+Meal entries: 1
+Total calories (kcal): 520
+Total protein (g): 35.0
+Total carbohydrates (g): 60.5
+Total fat (g): 15.0
+Daily nutrition totals:
+2026-10-22: 520 kcal; protein 35.0 g; carbs 60.5 g; fat 15.0 g
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 9
+
+Protect Your Progress
+
+FitFor stores your workout and nutrition records locally.
+- Review the date, name and ID before confirming deletion.
+- Avoid passwords, financial details or medical information in notes.
+- Review files and screenshots before sharing your fitness data.
+- Store backups securely and restrict access to your account and data folder.
+
+Records are not encrypted and there is no application login.
+FitFor records information; it does not provide medical recommendations.
+
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 3
+Workout ID to delete: 1
+You are about to permanently delete:
+Workout ID 1:
+2026-10-22 - Sample press
+Sets: 3; reps: 8; kg: 12.5
+Continue? (y/n): n
+Deletion cancelled.
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 2
+  ID  Date        Exercise                  Sets Reps        kg       Volume
+   1  2026-10-22  Sample press                 3    8     12.50       300.00
+  Notes: Synthetic final smoke
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 3
+Workout ID to delete: 1
+You are about to permanently delete:
+Workout ID 1:
+2026-10-22 - Sample press
+Sets: 3; reps: 8; kg: 12.5
+Continue? (y/n): y
+Workout deleted.
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 6
+Meal ID to delete: 1
+You are about to permanently delete:
+Meal ID 1:
+2026-10-22 - Sample wrap
+Meal type: lunch; kcal: 520
+Continue? (y/n): invalid
+Deletion cancelled.
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 5
+  ID  Date        Type       Food                      kcal
+   1  2026-10-22  lunch      Sample wrap                520
+  Protein: 35.00 g | Carbs: 60.50 g | Fat: 15.00 g
+  Notes: Synthetic final smoke
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 6
+Meal ID to delete: 1
+You are about to permanently delete:
+Meal ID 1:
+2026-10-22 - Sample wrap
+Meal type: lunch; kcal: 520
+Continue? (y/n): y
+Meal deleted.
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 2
+No workouts recorded.
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 5
+No meals recorded.
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 0
+Goodbye.
+
+Default launch check (exit only; no record access)
+Command: .\.venv\Scripts\python.exe main.py
+
+FITFOR
+1. Add workout
+2. View workouts
+3. Delete workout
+4. Add meal
+5. View meals
+6. Delete meal
+7. Workout report
+8. Nutrition report
+9. Privacy and data guidance
+0. Exit
+
+Choose an option: 0
+Goodbye.
