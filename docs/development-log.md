@@ -120,12 +120,33 @@ completed by the student in their own words.
 - What I learned: Student reflection pending; explain the separation between
   prompts, validation, persistence and calculations.
 
+## Step 6: Application entry point
+
+- Date: 22 October 2026 (session date).
+- Task: Start the existing package from a small `main.py`.
+- Files changed: `main.py`, `tests/test_main.py`, this log and `docs/testing.md`.
+- What was implemented: Main guard, storage/menu initialisation and an optional
+  `--data-file` argument for isolated data files. The default path is anchored
+  to the repository rather than the current working directory.
+- Problem encountered: Full-program checks must not touch normal user data.
+- How it was solved: Run subprocess tests against pytest temporary paths and
+  the live terminal check against a new, dedicated synthetic JSON file.
+- Tests performed: Full suite: 149 passed, 0 failed. Subprocesses verified
+  import safety, startup/exit, persistence across restart and both CRUD/report
+  flows. Live terminal flows also passed (300.0 volume, 520 kcal, both deletions).
+  The synthetic smoke file was inspected as empty and removed afterwards.
+- Observation for final cleanup: The meal table wraps on an 80-column terminal.
+- Git commit: `feat: add FitFor application entry point`.
+- What I learned: Student reflection pending; explain the main guard and why
+  test storage must be separate from normal records.
+
 ## Publication status during development
 
 The Step 2 push returned `Cannot prompt because user interactivity has been
 disabled` / `unable to get password from user`. Commits `babd4ea` and `8d3da7a`
 were still local at that attempt. The Step 3 push failed for the same reason;
 `e01b1fe` is also pending. The Step 4 push also failed with that error, leaving
-`da6fa38` local. Development continues under the user's updated
+`da6fa38` local. Step 5 push failed identically; `3b879ba` is pending too.
+Development continues under the user's updated
 instruction. Credentials are not modified; each stage attempts a normal push.
 The final audit will list all commits still awaiting manual publication.

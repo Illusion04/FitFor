@@ -9,7 +9,7 @@ On 22 October 2026 (session date), Codex ran:
 ```
 
 Environment: Python 3.12.10, pytest 9.1.1. Latest full-suite result:
-**146 passed, 0 failed** (models, validation, storage, reports and CLI).
+**149 passed, 0 failed** (including entry-point subprocess tests).
 All test entries are synthetic.
 Stage 1 originally passed 10 model tests; its results are retained below.
 
@@ -28,9 +28,10 @@ Stage 1 originally passed 10 model tests; its results are retained below.
 
 ## Manual evidence
 
-Live terminal check after Step 5: an invalid choice returned to the menu and
-`0` printed `Goodbye.` and exited normally. Full entry-point flows will be
-checked after Step 6. No screenshots have been captured.
+Live terminal checks after Steps 5–6 verified invalid choice handling, exit,
+and both complete add/view/report/delete workflows through `main.py`.
+The isolated synthetic smoke file was removed afterwards. No screenshots
+have been captured.
 
 ## Step 2: Validation
 
@@ -90,3 +91,18 @@ Full suite: 146 passed, 0 failed; 14 CLI cases.
 | C06 | Corrupt storage | View invalid JSON | Error shown; file unchanged; menu remains usable | Matched | Pass |
 | C07 | Cancellation | EOF and Ctrl+C during entry | Normal exit; no partial record saved | Matched | Pass |
 | C08 | Live menu smoke check | Enter invalid, then 0 in a real terminal session | Retry message then Goodbye and exit | Observed | Pass |
+
+## Step 6: Entry point and live flows
+
+Full suite: 149 passed, 0 failed; three entry-point subprocess tests.
+
+| Test ID | Feature | Input/action | Expected result | Actual result | Pass/fail |
+| --- | --- | --- | --- | --- | --- |
+| E01 | Startup/exit | Launch main.py with temporary path and enter 0 | Exit 0; no unnecessary data file | Matched | Pass |
+| E02 | Main guard | Import main in a subprocess | Import completes without launching menu | Matched | Pass |
+| E03 | Restart persistence | Add both types, restart, view/report/delete | Saved records survive; correct totals; empty after deletion | Matched | Pass |
+| E04 | Live workout flow | Add 3 × 8 × 12.5, view, report, confirm deletion | Displayed entry, 300.0 volume, successful delete | Observed | Pass |
+| E05 | Live meal flow | Add 520 kcal, 35 g protein, 60.5 g carbs, 15 g fat; view/report/delete | Correct entry and nutrient totals; successful delete | Observed | Pass |
+
+The live meal table wrapped at 80 columns; compact display is recorded for
+the final cleanup stage. No error occurred and data values were correct.
