@@ -9,7 +9,8 @@ On 22 October 2026 (session date), Codex ran:
 ```
 
 Environment: Python 3.12.10, pytest 9.1.1. Latest full-suite result:
-**88 passed, 0 failed** (models and validation). All test entries are synthetic.
+**118 passed, 0 failed** (models, validation and storage).
+All test entries are synthetic.
 Stage 1 originally passed 10 model tests; its results are retained below.
 
 | Test ID | Feature | Input/action | Expected result | Actual result | Pass/fail |
@@ -44,3 +45,18 @@ The full suite passed 88 tests after this stage, including 78 validation cases.
 | V05 | Calories | Zero, positive integers, negatives and fractions | Non-negative integers only | Matched | Pass |
 | V06 | Nutrients | Zero, decimals, text, NaN, infinities and overflowing numeric input | Finite non-negative numbers only | Matched | Pass |
 | V07 | Load | Blank, zero, fractional, negative and non-finite values | None or valid non-negative kg | Matched | Pass |
+
+## Step 3: Storage
+
+Full suite: 118 passed, 0 failed; 30 storage cases use temporary directories.
+
+| Test ID | Feature | Input/action | Expected result | Actual result | Pass/fail |
+| --- | --- | --- | --- | --- | --- |
+| S01 | Missing/empty files | Load absent, blank or empty collections | Empty lists; reads create no files | Matched | Pass |
+| S02 | Persistence | Add and reopen both record types with notes and nutrients | Equal records; ISO date in JSON; date object on load | Matched | Pass |
+| S03 | IDs | Add multiple records to both collections | Unique positive IDs within each collection | Matched | Pass |
+| S04 | Optional load | Save an entry without weight | JSON null and None restored | Matched | Pass |
+| S05 | Deletion | Delete an ID and a missing ID | Only selected collection changes; missing ID returns False | Matched | Pass |
+| S06 | Invalid IDs/schema | Booleans, duplicate IDs, invalid fields and malformed JSON | Clear error; existing data not overwritten | Matched | Pass |
+| S07 | Invalid model | Set sets to zero before saving | Save rejected; existing bytes unchanged | Matched | Pass |
+| S08 | Write failure | Simulate failure during atomic replacement | Existing bytes retained; temporary file cleaned up | Matched | Pass |

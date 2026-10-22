@@ -61,3 +61,31 @@ completed by the student in their own words.
   the existing Step 1 commit `babd4ea`.
 - What I learned: Student reflection pending; consider why parsing boundaries
   need tests for types, formats and non-finite numbers.
+
+## Step 3: JSON storage
+
+- Date: 22 October 2026 (session date).
+- Task: Persist both collections locally without mixing storage and UI.
+- Files changed: `fitfor/storage.py`, `tests/test_storage.py`, `.gitignore`,
+  this log and `docs/testing.md`.
+- What was implemented: Lazy directory creation on save, load/add/delete APIs,
+  assigned IDs, ISO dates, validated JSON records and atomic file replacement.
+  Empty/missing storage loads as empty; corrupt storage raises a clear error
+  and is not silently reset. Runtime data and environment files are ignored.
+- Problem encountered: Truncating a file before completing a write risks
+  losing existing records; malformed records must not be silently discarded.
+- How it was solved: Write and flush a temporary sibling file before replacing
+  the destination, and validate both collections before any save.
+- Tests performed: Full suite: 118 passed, 0 failed, including 30 storage cases
+  using temporary directories and a simulated replacement failure.
+- Git commit: `feat: add persistent JSON storage`.
+- What I learned: Student reflection pending; compare atomic replacement with
+  overwriting a file directly and explain the limits of single-writer storage.
+
+## Publication status during development
+
+The Step 2 push returned `Cannot prompt because user interactivity has been
+disabled` / `unable to get password from user`. Commits `babd4ea` and `8d3da7a`
+were still local at that attempt. Development continues under the user's updated
+instruction. Credentials are not modified; each stage attempts a normal push.
+The final audit will list all commits still awaiting manual publication.
