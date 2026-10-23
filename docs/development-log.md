@@ -253,3 +253,35 @@ The final cleanup commit also receives a normal push attempt; its outcome and
 hash are reported in the session handoff. Obtain the current complete pending
 list with `git log --oneline origin/master..HEAD`. Development continued under
 the user's updated instruction; credentials and history were not modified.
+
+## Desktop enhancement: repository inspection and baseline
+
+- Date: 23 October 2026 (session date).
+- Task: Inspect the working CLI before adding the requested Tkinter interface.
+- Files inspected: Models, validation, storage, reports, CLI, entry point,
+  existing tests, README, requirements and ignore rules.
+- Findings: Clean `master`, tracking `origin/master` at `84f49ab`; the expected
+  FitFor remote is configured. Earlier pending-push notes above are historical.
+  Python 3.12.10 includes Tk 8.6. Existing business APIs are suitable for reuse.
+- Tests run: Pre-GUI `python -m pytest`: 182 passed, 0 failed in 0.86 seconds.
+- Implementation decision: Preserve CLI and JSON format. Add a separate GUI
+  launcher and small, headless GUI adapters where they enable useful tests.
+- Commit: Baseline is the existing `84f49ab`; GUI milestone commits follow.
+- What was learned: Student reflection pending; explain why confirming a
+  baseline matters before extending an application through another interface.
+
+## GUI milestone 1: Shell and navigation
+
+- Date: 23 October 2026 (session date).
+- Task: Add an independent Tkinter launcher and coherent application shell.
+- Files changed: `gui.py`, this log and `docs/gui-smoke-test.md`.
+- Implemented: Resizable 1100 × 740 window, five Notebook tabs, consistent ttk
+  styles, header/status areas and the same default JSON path as the CLI.
+- Problem encountered: Computer Use capture timed out awaiting app approval.
+- Resolution: User approved access. Real-window captures confirmed the shell
+  rendering and tab switching (Dashboard, Workouts and Meals). The preview
+  closed normally before further development.
+- Tests: Full suite after shell creation: 182 passed, 0 failed. Tk 8.6 available.
+- Commit: `feat: add Tkinter application shell and navigation`.
+- What was learned: Student reflection pending; explain the event loop and
+  why an independent GUI entry point preserves the existing CLI.
