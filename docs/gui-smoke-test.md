@@ -18,3 +18,11 @@ No screenshot files have been saved yet.
 
 The full suite after the shell milestone passed 182 tests, 0 failed.
 Further milestone results and final workflow checks will be recorded here.
+
+## Workout milestone
+
+Full suite: **200 passed, 0 failed**, including 18 headless adapter cases.
+Actual form/table rendering was inspected. The inspection identified footer
+clipping; the outer layout was changed to a weighted grid. Final resizing and
+complete save/delete flows will be checked against the finished application.
+`python gui.py --help` passed without opening a Tk window.

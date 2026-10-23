@@ -285,3 +285,23 @@ the user's updated instruction; credentials and history were not modified.
 - Commit: `feat: add Tkinter application shell and navigation`.
 - What was learned: Student reflection pending; explain the event loop and
   why an independent GUI entry point preserves the existing CLI.
+
+## GUI milestone 2: Workout management
+
+- Date: 23 October 2026 (session date).
+- Task: Add the workout form, saved-record table, refresh and safe deletion.
+- Files changed: `gui.py`, `fitfor/gui_support.py`,
+  `tests/test_gui_support.py`, this log and desktop verification notes.
+- Implemented: Shared-validator form conversion, default date, optional load
+  and notes, save/clear feedback, scrollable table and confirmation-driven
+  deletion using the existing Storage API. Stale selections are rejected.
+- Problem encountered: The real window exposed footer clipping when the table
+  requested more height, and selected tabs inherited smaller theme padding.
+- Resolution: Use a weighted outer grid and explicit selected-tab padding.
+  Final resizing checks will follow when all views exist.
+- Tests: 200 passed, 0 failed, including 18 new headless GUI adapter tests.
+  Launcher --help passed. Actual workout form and empty table were inspected.
+- Commit: `feat: add graphical workout management`.
+- Publication: Shell commit `da20554` pushed successfully to origin/master.
+- What was learned: Student reflection pending; explain mapping form text to
+  existing models and why confirmation must precede the persistence call.
