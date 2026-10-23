@@ -345,3 +345,22 @@ the user's updated instruction; credentials and history were not modified.
 - Publication: Meal milestone `d60d23a` pushed successfully to origin/master.
 - What was learned: Student reflection pending; explain separating presentation
   from calculation and choosing an explicit time period for each metric.
+
+## GUI milestone 5: Graphical reports
+
+- Date: 23 October 2026 (session date).
+- Task: Add workout/nutrition summaries with optional inclusive date bounds.
+- Files changed: `gui.py`, `fitfor/gui_support.py`, `tests/test_gui_support.py`
+  and this log.
+- Implemented: Start/end inputs, Generate Report, All Dates, summary cards
+  and daily nutrient totals. All calculations reuse `fitfor.reports`.
+- Problem considered: A partially edited filter should not trigger an error
+  while saving an unrelated entry.
+- Resolution: Keep the last successfully applied date range until Generate
+  Report validates the new inputs. Invalid ranges leave the previous report.
+- Tests: Full suite: 224 passed, 0 failed. Ten new cases cover inclusive/open
+  bounds, empty periods, invalid/reversed dates, daily grouping and overflow.
+- Commit: `feat: add graphical workout and nutrition reports`.
+- Publication: Dashboard milestone `a99434f` pushed to origin/master.
+- What was learned: Student reflection pending; explain why filtering belongs
+  in the shared reporting layer rather than separate GUI calculations.

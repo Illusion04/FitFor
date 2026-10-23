@@ -6,7 +6,7 @@ from math import isfinite
 from typing import Literal
 
 from fitfor.models import Meal, Workout
-from fitfor.reports import nutrition_summary, workout_summary
+from fitfor.reports import daily_nutrition_summary, nutrition_summary, workout_summary
 from fitfor.storage import Storage
 from fitfor.validation import (
     validate_date,
@@ -70,6 +70,20 @@ def dashboard_data(
         "workouts": workout_summary(workouts),
         "nutrition": nutrition_summary(meals, today, today),
         "recent": recent[:8],
+    }
+
+
+def report_data(
+    workouts: list[Workout], meals: list[Meal], start_text: str = "",
+    end_text: str = "",
+) -> dict:
+    """Validate optional bounds and delegate every calculation to reports."""
+    start = validate_date(start_text) if start_text.strip() else None
+    end = validate_date(end_text) if end_text.strip() else None
+    return {
+        "workouts": workout_summary(workouts, start, end),
+        "nutrition": nutrition_summary(meals, start, end),
+        "daily": daily_nutrition_summary(meals, start, end),
     }
 
 

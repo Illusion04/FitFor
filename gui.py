@@ -8,7 +8,8 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 
 from fitfor.gui_support import (
-    dashboard_data, delete_record, meal_from_form, volume_text, workout_from_form,
+    dashboard_data, delete_record, meal_from_form, report_data, volume_text,
+    workout_from_form,
 )
 from fitfor.models import Workout
 from fitfor.storage import DEFAULT_DATA_PATH, Storage, StorageError
@@ -364,6 +365,7 @@ class FitForApp(ttk.Frame):
             "No meals yet" if count == 0 else f"Meal entries ({count})"
         )
         self._refresh_dashboard(workouts, meals)
+        self._refresh_reports(workouts, meals)
         self.status.set("Records refreshed.")
         return True
 
@@ -465,10 +467,87 @@ class FitForApp(ttk.Frame):
         )
 
     def _build_reports(self) -> None:
+        tab = self.tabs["Reports"]
         self._page_header(
-            self.tabs["Reports"], "Reports",
-            "Explore the information you recorded over a selected period.",
+            tab, "Reports",
+            "Descriptive totals from your records. Dates include both endpoints.",
         )
+        filters = ttk.Frame(tab, style="Card.TFrame", padding=(16, 10))
+        filters.pack(fill="x", pady=(0, 14))
+        self.report_fields = {}
+        self.report_period = ("", "")
+        self._form_field(filters, self.report_fields, "start", "Start date (optional)", 0, 0)
+        self._form_field(filters, self.report_fields, "end", "End date (optional)", 0, 1)
+        ttk.Button(filters, text="Generate Report", style="Accent.TButton",
+                   command=self._generate_reports).grid(row=0, column=2, padx=(4, 8))
+        ttk.Button(filters, text="All Dates", command=self._all_dates).grid(row=0, column=3)
+        cards = ttk.Frame(tab)
+        cards.pack(fill="x")
+        cards.columnconfigure((0, 1), weight=1)
+        self.report_workout = self._summary_card(cards, "WORKOUT SUMMARY", [
+            ("workout_entries", "Exercise entries"), ("total_sets", "Total sets"),
+            ("total_reps", "Total reps"), ("recorded_volume", "Recorded volume (kg × reps)"),
+        ], 0)
+        self.report_nutrition = self._summary_card(cards, "NUTRITION SUMMARY", [
+            ("total_calories", "Calories (kcal)"), ("total_protein_g", "Protein (g)"),
+            ("total_carbs_g", "Carbohydrates (g)"), ("total_fat_g", "Fat (g)"),
+        ], 1)
+        self.report_note = tk.StringVar(self.root)
+        ttk.Label(tab, textvariable=self.report_note, style="Muted.TLabel").pack(
+            anchor="w", pady=(10, 12),
+        )
+        daily = ttk.Frame(tab, style="Card.TFrame", padding=14)
+        daily.pack(fill="both", expand=True)
+        ttk.Label(daily, text="Daily nutrition totals", style="CardTitle.TLabel").pack(
+            anchor="w", pady=(0, 8),
+        )
+        self.trees["daily"] = self._table(daily, [
+            ("date", "Date", 145), ("entries", "Meals", 85),
+            ("calories", "Calories (kcal)", 155), ("protein", "Protein (g)", 150),
+            ("carbs", "Carbohydrates (g)", 165), ("fat", "Fat (g)", 140),
+        ])
+
+    def _generate_reports(self) -> None:
+        start = self.report_fields["start"].get().strip()
+        end = self.report_fields["end"].get().strip()
+        try:
+            report_data([], [], start, end)
+        except ValueError as error:
+            self._show_error("Invalid report dates", str(error))
+            return
+        self.report_period = (start, end)
+        if self.refresh_all():
+            self.status.set("Report refreshed using the selected dates.")
+
+    def _all_dates(self) -> None:
+        for variable in self.report_fields.values():
+            variable.set("")
+        self._generate_reports()
+
+    def _refresh_reports(self, workouts, meals) -> None:
+        tree = self.trees["daily"]
+        tree.delete(*tree.get_children())
+        try:
+            data = report_data(workouts, meals, *self.report_period)
+        except ValueError as error:
+            self._set_metrics(self.report_workout, {})
+            self._set_metrics(self.report_nutrition, {})
+            self.report_note.set(f"Report unavailable: {error}")
+            return
+        self._set_metrics(self.report_workout, data["workouts"])
+        self._set_metrics(self.report_nutrition, data["nutrition"])
+        start, end = self.report_period
+        period = "All dates" if not start and not end else f"{start or 'Beginning'} to {end or 'Latest'}"
+        self.report_note.set(
+            f"{period} · Unknown loads excluded from volume. "
+            + ("No meals in this period." if not data["daily"] else "Recorded values only.")
+        )
+        for index, (day, totals) in enumerate(data["daily"].items()):
+            tree.insert("", "end", values=(
+                day.isoformat(), totals["meal_entries"], totals["total_calories"],
+                f'{totals["total_protein_g"]:,.2f}', f'{totals["total_carbs_g"]:,.2f}',
+                f'{totals["total_fat_g"]:,.2f}',
+            ), tags=("even" if index % 2 == 0 else "odd",))
 
     def _build_privacy(self) -> None:
         self._page_header(

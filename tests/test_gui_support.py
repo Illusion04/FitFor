@@ -6,7 +6,8 @@ from datetime import date
 import pytest
 
 from fitfor.gui_support import (
-    dashboard_data, delete_record, meal_from_form, volume_text, workout_from_form,
+    dashboard_data, delete_record, meal_from_form, report_data, volume_text,
+    workout_from_form,
 )
 from fitfor.models import Meal, Workout
 from fitfor.storage import Storage
@@ -212,3 +213,42 @@ def test_dashboard_limits_recent_activity_without_mutating_source():
     assert len(data["recent"]) == 8
     assert data["recent"][0][2] == "Sample 14"
     assert workouts[0].exercise == "Sample 1"
+
+
+@pytest.mark.parametrize(("start", "end", "count"), [
+    ("", "", 3), ("2026-10-22", "2026-10-22", 1),
+    ("2026-10-22", "", 2), ("", "2026-10-22", 2),
+    ("2026-11-01", "2026-11-02", 0),
+])
+def test_gui_reports_use_inclusive_optional_date_bounds(start, end, count):
+    workouts = [Workout(date(2026, 10, day), "Sample", 2, 5, 10) for day in (21, 22, 23)]
+    meals = [Meal(date(2026, 10, day), "lunch", "Sample", 200, 10,
+                  carbs_g=20, fat_g=5) for day in (21, 22, 23)]
+    data = report_data(workouts, meals, start, end)
+    assert data["workouts"]["workout_entries"] == count
+    assert data["workouts"]["recorded_volume"] == 100 * count
+    assert data["nutrition"]["total_calories"] == 200 * count
+    assert len(data["daily"]) == count
+
+
+@pytest.mark.parametrize(("start", "end", "message"), [
+    ("bad", "", "Date"), ("", "2026-02-29", "Date"),
+    ("2026-10-23", "2026-10-22", "Start date"),
+])
+def test_gui_reports_reject_invalid_dates_even_with_empty_data(start, end, message):
+    with pytest.raises(ValueError, match=message):
+        report_data([], [], start, end)
+
+
+def test_gui_reports_aggregate_multiple_meals_per_day():
+    day = date(2026, 10, 23)
+    meals = [Meal(day, "lunch", "Sample A", 100, 10.25),
+             Meal(day, "dinner", "Sample B", 200, 20.25)]
+    data = report_data([], meals)
+    assert data["daily"][day] == data["nutrition"]
+    assert data["nutrition"]["total_protein_g"] == 30.5
+
+
+def test_gui_reports_explain_numeric_overflow():
+    with pytest.raises(ValueError, match="numeric range"):
+        report_data([Workout(date(2026, 10, 23), "Sample", 3, 8, 1e308)], [])
