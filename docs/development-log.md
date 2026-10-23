@@ -364,3 +364,23 @@ the user's updated instruction; credentials and history were not modified.
 - Publication: Dashboard milestone `a99434f` pushed to origin/master.
 - What was learned: Student reflection pending; explain why filtering belongs
   in the shared reporting layer rather than separate GUI calculations.
+
+## GUI milestone 6: Privacy, errors and layout refinement
+
+- Date: 23 October 2026 (session date).
+- Task: Complete privacy guidance and improve practical desktop feedback.
+- Files changed: `gui.py` and this log.
+- Implemented: Protect Your Progress panels covering plain local JSON, no
+  encryption/login, minimal notes, access controls, sharing, backups and safe
+  deletion. Reports are descriptive and provide no diagnosis. Long errors use
+  the dialog for detail; an unavailable Tk display produces a clear launch error.
+- Problem encountered: Real-window inspection showed the meal form consumed
+  table space at the default size.
+- Resolution: Place meal fields in two rows with compact optional notes.
+  Dashboard empty-state metrics and the status footer rendered correctly.
+- Tests: Full suite: 224 passed, 0 failed. Final native workflows and refined
+  meal/report/privacy layout checks follow in the integration milestone.
+- Commit: `feat: improve GUI validation privacy and user feedback`.
+- Publication: Reports milestone `a1df7b3` pushed to origin/master.
+- What was learned: Student reflection pending; explain why visual inspection
+  complements headless tests and why privacy text must describe actual controls.

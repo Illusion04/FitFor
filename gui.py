@@ -302,7 +302,7 @@ class FitForApp(ttk.Frame):
         self.status.set("Form cleared. Saved records are unchanged.")
 
     def _show_error(self, title: str, message: str) -> None:
-        self.status.set(message)
+        self.status.set(message if len(message) <= 140 else f"{title}. See dialog for details.")
         messagebox.showerror(title, message, parent=self.root)
 
     def _save_workout(self) -> None:
@@ -412,21 +412,21 @@ class FitForApp(ttk.Frame):
         )
         card = ttk.Frame(tab, style="Card.TFrame", padding=14)
         card.pack(fill="x", pady=(0, 14))
-        for column in range(4):
+        for column in range(5):
             card.columnconfigure(column, weight=1)
         fields = {}
         self.forms["meal"] = fields
         self._form_field(card, fields, "log_date", "Date (YYYY-MM-DD)", 0, 0)
         self._form_field(card, fields, "meal_type", "Meal type (e.g. lunch)", 0, 1)
-        self._form_field(card, fields, "food", "Food / meal name", 0, 2, 2)
+        self._form_field(card, fields, "food", "Food / meal name", 0, 2, 3)
         for column, (name, label) in enumerate([
             ("calories", "Calories (kcal)"), ("protein_g", "Protein (g)"),
             ("carbs_g", "Carbohydrates (g)"), ("fat_g", "Fat (g)"),
         ]):
             self._form_field(card, fields, name, label, 1, column)
-        self._form_field(card, fields, "notes", "Notes (optional)", 2, 0, 4)
+        self._form_field(card, fields, "notes", "Notes (optional)", 1, 4)
         actions = ttk.Frame(card, style="Card.TFrame")
-        actions.grid(row=3, column=0, columnspan=4, sticky="w", pady=(4, 0))
+        actions.grid(row=2, column=0, columnspan=5, sticky="w", pady=(4, 0))
         ttk.Button(actions, text="Save Meal", style="Accent.TButton",
                    command=self._save_meal).pack(side="left", padx=(0, 8))
         ttk.Button(actions, text="Clear Form",
@@ -550,10 +550,58 @@ class FitForApp(ttk.Frame):
             ), tags=("even" if index % 2 == 0 else "odd",))
 
     def _build_privacy(self) -> None:
+        tab = self.tabs["Privacy"]
         self._page_header(
-            self.tabs["Privacy"], "Protect Your Progress",
+            tab, "Protect Your Progress",
             "Small habits that help you manage personal records carefully.",
         )
+        intro = ttk.Frame(tab, style="Card.TFrame", padding=(20, 16))
+        intro.pack(fill="x", pady=(0, 16))
+        ttk.Label(intro, text="LOCAL RECORDS, INFORMED CHOICES",
+                  style="CardTitle.TLabel").pack(anchor="w", pady=(0, 8))
+        self._wrapped_label(
+            intro, "FitFor stores workout and nutrition information locally on your device. "
+            "The CLI and desktop interface use the same JSON file by default. "
+            "FitFor does not encrypt records and has no application login.",
+        )
+        advice = ttk.Frame(tab)
+        advice.pack(fill="both", expand=True)
+        advice.columnconfigure((0, 1), weight=1, uniform="privacy")
+        advice.rowconfigure(0, weight=1)
+        for column, (title, paragraphs) in enumerate([
+            ("Keep personal details minimal", [
+                "Avoid passwords, banking details and unnecessary medical information in notes.",
+                "Use your operating system account and folder permissions to restrict access.",
+                "Shared devices, copied JSON files and screenshots may expose your records.",
+            ]),
+            ("Review, share and back up carefully", [
+                "Check the date, name and ID before confirming a deletion. Cancel if unsure.",
+                "Review copied or exported information before sharing it. Use synthetic examples for assessment evidence.",
+                "Store backups securely. Deleting an entry does not remove earlier backup copies.",
+            ]),
+        ]):
+            card = ttk.Frame(advice, style="Card.TFrame", padding=20)
+            card.grid(row=0, column=column, sticky="nsew",
+                      padx=(0, 8) if column == 0 else (8, 0))
+            ttk.Label(card, text=title, style="CardTitle.TLabel").pack(
+                anchor="w", pady=(0, 10),
+            )
+            for paragraph in paragraphs:
+                label = self._wrapped_label(card, paragraph)
+                label.pack_configure(pady=(0, 14))
+        note = ttk.Frame(tab, style="Card.TFrame", padding=(20, 14))
+        note.pack(fill="x", pady=(16, 0))
+        self._wrapped_label(
+            note, "FitFor is a personal logging tool and does not provide medical or "
+            "nutritional diagnosis. Reports describe only the values you recorded.",
+        )
+
+    @staticmethod
+    def _wrapped_label(parent, text):
+        label = ttk.Label(parent, text=text, style="Card.TLabel", justify="left", wraplength=400)
+        label.pack(fill="x", anchor="w")
+        label.bind("<Configure>", lambda event: label.configure(wraplength=max(160, event.width)))
+        return label
 
 
 def main(argv: Sequence[str] | None = None) -> None:
@@ -564,7 +612,10 @@ def main(argv: Sequence[str] | None = None) -> None:
         help="JSON file shared with the CLI (default: data/fitfor_data.json)",
     )
     arguments = parser.parse_args(argv)
-    root = tk.Tk()
+    try:
+        root = tk.Tk()
+    except tk.TclError as error:
+        parser.exit(1, f"Unable to start the desktop interface: {error}\n")
     FitForApp(root, Storage(arguments.data_file))
     root.mainloop()
 
