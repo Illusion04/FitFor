@@ -1,6 +1,7 @@
 # FitFor threat model
 
-Scope: one person running a local CLI, with plain-text JSON storage. There is
+Scope: one person running the local CLI or Tkinter GUI with shared plain-text
+JSON storage. There is
 no application authentication, encryption, cloud service or network API.
 This table describes limited controls and remaining risks, not a guarantee
 of security. All examples in the tests and documentation are synthetic.
@@ -22,3 +23,17 @@ The JSON store supports a single writer. Atomic replacement reduces partial
 write risk; it is not protection against two instances overwriting each
 other's changes. IDs identify current records within a collection and may be
 reused after records are deleted; they are not permanent audit identifiers.
+
+## Desktop interface controls
+
+The Privacy tab delivers the same minimisation, sharing and backup guidance.
+GUI deletion previews the full target and requires Yes, with No as its default.
+The adapter re-reads the selected entry before and after confirmation and
+rejects changed/reused IDs. These checks reduce stale-selection risk; they
+do not provide locking or eliminate concurrent-writer races.
+
+Invalid form values produce readable dialogs and remain available for
+correction. Storage failures are shown without silently resetting the file.
+GUI forms and summaries add no login, encryption or new network service.
+Headless confirmation/integration tests and real-window observations are
+recorded in `docs/gui-smoke-test.md` and the two `test_gui_*` modules.

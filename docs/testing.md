@@ -8,8 +8,10 @@ On 22 October 2026 (session date), Codex ran:
 .\.venv\Scripts\python.exe -m pytest -v
 ```
 
-Environment: Python 3.12.10, pytest 9.1.1. Latest full-suite result:
-**182 passed, 0 failed** (final full suite).
+Environment: Python 3.12.10, pytest 9.1.1. Pre-GUI full-suite result:
+**182 passed, 0 failed**. The desktop enhancement on 23 October 2026 passed
+**229 tests, 0 failed**, preserving all original cases. See the desktop section
+below for the current result; the earlier stage results remain historical.
 All test entries are synthetic.
 Stage 1 originally passed 10 model tests; its results are retained below.
 
@@ -183,3 +185,44 @@ is retained; no screenshots or user feedback are fabricated.
 Screenshots and personal learning reflections remain student actions. The
 threat table covers controls and residual risks; it is not a claim that the
 application is fully secure or that campaign effectiveness was measured.
+
+## Desktop enhancement: automated and native verification
+
+23 October 2026, Python 3.12.10 / Tk 8.6 / pytest 9.1.1:
+
+| GUI milestone | Full suite passed | Failed | New cases at that milestone |
+| --- | ---: | ---: | ---: |
+| Shell/navigation | 182 | 0 | 0 |
+| Workout management | 200 | 0 | 18 |
+| Meal management | 211 | 0 | 11 |
+| Dashboard | 214 | 0 | 3 |
+| Reports | 224 | 0 | 10 |
+| Privacy/feedback | 224 | 0 | 0 |
+| Integration | 229 | 0 | 5 |
+
+`tests/test_gui_support.py` exercises shared-validator conversion, blank
+optional values, invalid dates/text/numbers, report/date calculations,
+unknown loads, overflow, ordering and safe confirmation. Deletion tests
+reject missing/changed/reused IDs and preserve other records/collections.
+`tests/test_gui_integration.py` verifies GUI-to-CLI viewing/reporting,
+CLI-to-GUI summaries/deletion, corrupt-file preservation and launcher help.
+All new tests are headless and use temporary synthetic files.
+
+The native Windows window was operated through Computer Use with user approval.
+Observed workflows included valid saves, automatic form clearing, retained
+invalid values, six required validation messages, persistence after restart,
+both dashboards/reports, daily nutrition totals, date filtering, no selection,
+default-No cancellation, confirmed deletion of both types, privacy guidance,
+maximize/restore and clean exit. The existing CLI also read both GUI-created
+records from the same isolated JSON file. No private/default records were used.
+
+The native test found layout clipping that automated logic tests could not
+detect; compact forms/filters and a minimum logical height corrected it.
+Full observations and explicit limits: [GUI smoke test](gui-smoke-test.md).
+Complete integration run output (229 passed in 1.30 s):
+[GUI pytest results](gui-pytest-results.txt).
+
+These results were agent-operated, not claimed as student-authored testing or
+personal reflection. Screenshot files and student learning entries remain
+pending. Historical CLI evidence files are retained without relabelling them
+as desktop evidence.

@@ -1,8 +1,9 @@
 # FitFor
 
-FitFor is a small Python command-line workout and meal logger developed for
-**PFD200 Professional Development**. It records entries locally and summarises
-the information entered by the user.
+FitFor is a Python workout and meal logger with a **command-line interface**
+and a **Tkinter desktop interface**, developed for **PFD200 Professional
+Development**. Both interfaces record entries locally and summarise the
+information entered by the user.
 
 ## Purpose
 
@@ -25,33 +26,42 @@ student's own reflection should connect that work to their individual skill gap.
   repetitions across sets and recorded-load volume.
 - Summarise calories and nutrients, including daily totals.
 - Filter reports using inclusive start/end dates; either boundary can be blank.
-- Show the full target date/name/ID before deletion; only an explicit `y`
-  confirms. Blank, invalid responses and interrupted prompts do not delete.
-- Display **Protect Your Progress** privacy guidance through menu option 9.
+- Show the full target date/name/ID before deletion. The CLI requires `y`;
+  the GUI requires Yes and defaults to No. Cancellation preserves the record.
+- Display **Protect Your Progress** through CLI option 9 and the Privacy tab.
 - Report storage errors without silently replacing corrupt records.
+- Navigate five desktop tabs: Dashboard, Workouts, Meals, Reports and Privacy.
+- Use validated forms, scrollable tables, save/clear feedback and refreshed
+  dashboards/reports after each save or deletion.
+- See all-time workout metrics, today's nutrient totals and recent activity
+  on the desktop dashboard.
 
 ## Technology
 
 Runtime uses Python's standard library: `dataclasses`, `datetime`, `json`,
-`pathlib`, `argparse` and supporting modules. There are no runtime packages
-to install. Tests use pytest and its dependencies from `requirements.txt`.
+`pathlib`, `argparse`, `tkinter`/`ttk` and supporting modules. There are no
+third-party runtime packages to install. Tests use pytest and its dependencies
+from `requirements.txt`.
 Development uses Git/GitHub.
 
-Verified environment: **Python 3.12.10 and pytest 9.1.1**. Python 3.12 is the
-recommended setup for reproducing the recorded results.
+Verified environment: **Windows, Python 3.12.10, Tk 8.6 and pytest 9.1.1**.
+Use a Python installation that includes Tcl/Tk for the desktop interface.
+Other operating systems have not been visually tested in this project.
 
 ## Project architecture
 
 ```text
 FitFor/
-├── main.py                 # Application entry point and data-file argument
+├── main.py                 # CLI entry point and data-file argument
+├── gui.py                  # Tkinter desktop entry point and widgets
 ├── fitfor/
 │   ├── __init__.py
 │   ├── models.py           # Workout and Meal dataclasses
 │   ├── validation.py       # Reusable parsing and validation
 │   ├── storage.py          # JSON persistence and record validation
 │   ├── reports.py          # Pure summary calculations
-│   └── cli.py              # Menu, prompts, tables and privacy guidance
+│   ├── cli.py              # Menu, prompts, tables and privacy guidance
+│   └── gui_support.py      # Headless form/report/deletion adapters
 ├── tests/                  # Synthetic unit and integration tests
 ├── docs/                   # Development, test and assessment evidence
 │   └── screenshots/        # Genuine screenshots to be captured manually
@@ -61,6 +71,11 @@ FitFor/
 ```
 
 The existing package layout is retained; there is no second nested project.
+Both interfaces use the same `Workout`/`Meal` dataclasses, reusable validators,
+atomic JSON `Storage` and pure report functions. `gui.py` owns widgets and
+callbacks; `gui_support.py` converts form strings and coordinates reporting
+and confirmation without importing Tkinter. No separate GUI models, database
+or validation rules were introduced. The existing CLI modules are preserved.
 
 ## Installation
 
@@ -87,8 +102,18 @@ After activation, `python` refers to the environment's interpreter.
 
 ## Running
 
+With the virtual environment activated:
+
+```powershell
+python main.py  # CLI
+python gui.py   # Desktop GUI
+```
+
+Without activation, use the environment's interpreter explicitly:
+
 ```powershell
 .\.venv\Scripts\python.exe main.py
+.\.venv\Scripts\python.exe gui.py
 ```
 
 With the environment activated, the equivalent command is `python main.py`.
@@ -99,12 +124,35 @@ To use an isolated file for a demonstration with synthetic data:
 
 ```powershell
 .\.venv\Scripts\python.exe main.py --data-file data\demo.json
+.\.venv\Scripts\python.exe gui.py --data-file data\demo.json
 ```
 
 The normal file is `data/fitfor_data.json` relative to the project directory,
 even when the program is launched from another directory. An explicitly
 supplied relative `--data-file` path is relative to the current directory.
 The directory/file is created when an entry is first saved.
+Both launchers use this same default. Use one application instance at a time;
+after switching between interfaces, use Refresh to reload saved changes.
+
+## Desktop workflow
+
+- **Dashboard:** all-date exercise entries, sets, total reps and recorded-load
+  volume; today's calories/nutrients; the latest eight dated entries.
+- **Workouts:** enter date, exercise, positive sets/reps and optional kg/notes.
+  Save Workout persists the entry, clears the form and refreshes all views.
+- **Meals:** enter date, meal type, food, integer kcal and nutrient grams.
+  Carbohydrates/fat start at zero; notes are optional. Save Meal refreshes all
+  views and clears the form. Invalid input remains available for correction.
+- **Reports:** leave either date blank for an open boundary. Generate Report
+  applies valid inclusive dates; All Dates resets the filter. Daily nutrition
+  totals appear below both summaries. Typed filters take effect on Generate.
+- **Privacy:** read Protect Your Progress and the storage/security limitations.
+
+Select a table row before Delete Selected. Check the confirmation's full date,
+name and ID, then choose Yes or No. Clear Form affects only unsaved inputs.
+The window opens at 1100 × 740 logical pixels and supports resizing with a
+960 × 740 minimum; tables have vertical/horizontal scrollbars. Larger screen
+scaling can require more physical screen space.
 
 ## Interpreting reports
 
@@ -132,8 +180,15 @@ recorded as entered, not estimated from a nutrition database.
 
 With activation, use `python -m pytest -v`. The suite covers models, validation,
 temporary-file persistence, known report totals, CLI input/error handling,
-safe deletion and real entry-point subprocesses. Tests use synthetic data and
-temporary directories rather than the normal user data file.
+safe deletion and real entry-point subprocesses. GUI support tests run without
+opening a Tk window and verify conversions, summaries, filters, deletion and
+shared CLI/GUI persistence. Tests use synthetic data and temporary directories
+rather than the normal user data file.
+
+Desktop enhancement result: **229 passed, 0 failed**, including all original
+182 tests and 47 new GUI support/integration cases. See the
+[GUI smoke-test report](docs/gui-smoke-test.md) for observed real-window flows
+and [full pytest output](docs/gui-pytest-results.txt).
 
 See [testing evidence](docs/testing.md) for actual results and live terminal
 checks, including the initially failing regression cases and their fixes.
@@ -169,8 +224,11 @@ Project type: Python mini-project
   tests and commit subjects; student reflection is clearly left pending.
 - [Testing document](docs/testing.md): expected/actual results and live checks.
 - [Captured pytest output](docs/pytest-results.txt) and
-  [live smoke-test transcript](docs/final-smoke-test.txt): actual final runs
-  operated by Codex, using synthetic data.
+  [live CLI smoke-test transcript](docs/final-smoke-test.txt): historical
+  pre-GUI runs operated by Codex, using synthetic data.
+- [Desktop verification](docs/gui-smoke-test.md) and
+  [GUI-era pytest output](docs/gui-pytest-results.txt): actual native GUI
+  observations and the expanded 229-test result.
 - [Threat model](docs/threat-model.md): technical and human vulnerabilities,
   implemented controls and residual risks.
 - [Protect Your Progress campaign](docs/privacy-campaign.md): in-app messages
@@ -185,9 +243,28 @@ synthetic entries and save the images under `docs/screenshots/`. Useful views
 are the main menu, workout/nutrition reports, deletion preview, privacy guidance
 and pytest summary. Review each image for personal information before sharing.
 
+### GUI screenshots
+
+Screenshot files are **pending genuine capture**. The real desktop was visually
+tested; the repository contains the factual smoke-test report rather than
+invented images. Use a separate synthetic data file and capture:
+
+| Suggested file in `docs/screenshots/` | Evidence |
+| --- | --- |
+| `gui-dashboard.png` | Workout metrics, today's nutrition and recent activity |
+| `gui-add-workout.png` | Completed synthetic workout form before Save |
+| `gui-workout-list.png` | Saved row, computed volume and success status |
+| `gui-meals.png` | Meal form/list with kcal, protein, carbohydrates and fat |
+| `gui-reports.png` | Both summaries, date filters and daily totals |
+| `gui-delete-confirmation.png` | Full target preview and default No |
+| `gui-privacy.png` | Protect Your Progress guidance and limitations |
+| `gui-tests.png` | Actual full-suite result in the terminal |
+
+These filenames describe planned captures; they are not existing image links.
+
 ## Limitations
 
-- CLI only; one local user and one writer at a time. Concurrent instances can
+- Desktop GUI and CLI; one local user and one writer at a time. Concurrent instances can
   overwrite each other's changes; atomic saves are not a locking mechanism.
 - No authentication, encryption, external services or nutrition database.
 - No edit, export, undo, automatic backup or automatic corruption repair.
@@ -198,5 +275,5 @@ and pytest summary. Review each image for personal information before sharing.
 
 ## Possible future development
 
-Potential extensions include SQLite, a GUI/web interface, authentication,
-encrypted storage and richer analytics. None is part of this implementation.
+Potential extensions include SQLite, a web interface, encrypted storage and
+richer analytics. None is part of this implementation.

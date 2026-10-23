@@ -409,3 +409,28 @@ the user's updated instruction; credentials and history were not modified.
 - Publication: Privacy milestone `ebd4d60` pushed to origin/master.
 - What was learned: Student reflection pending; describe the layout problem
   found by native testing and how shared storage was verified in both directions.
+
+## GUI milestone 8: Desktop documentation and handoff
+
+- Date: 23 October 2026 (session date).
+- Task: Document both interfaces and connect the desktop work to assessment evidence.
+- Files changed: `README.md`, `docs/testing.md`, `docs/assessment-checklist.md`,
+  `docs/threat-model.md`, `docs/privacy-campaign.md` and this log.
+- Implemented: CLI/GUI launch instructions, shared-layer architecture,
+  desktop usage, report semantics, layout requirements, current test totals,
+  actual native verification links and a genuine screenshot capture plan.
+  Security documentation now includes GUI confirmations and their limits.
+- Problem considered: Earlier evidence describes the completed CLI and must
+  not be presented as proof of later desktop testing.
+- Resolution: Retain historical results and link separate GUI-era observations
+  and pytest output. Screenshots, personal reflection and campaign evaluation
+  remain clearly identified as student actions.
+- Tests/checks: Full suite rerun: 229 passed, 0 failed in 1.30 s. `git diff --check`
+  passed. Original main/CLI/models/validation/storage/reports/requirements have
+  no diff from the pre-GUI baseline. Runtime data, environment and caches remain
+  Git-ignored. Only intended source, tests and documentation were staged.
+- Commit: `docs: document FitFor desktop interface`.
+- Publication: Integration milestone `a528956` pushed to origin/master; final
+  documentation publication and repository status are verified in the handoff.
+- What was learned: Student reflection pending; connect event-driven UI work,
+  shared logic, automated testing and actual visual testing to your skill gap.
