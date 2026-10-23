@@ -305,3 +305,23 @@ the user's updated instruction; credentials and history were not modified.
 - Publication: Shell commit `da20554` pushed successfully to origin/master.
 - What was learned: Student reflection pending; explain mapping form text to
   existing models and why confirmation must precede the persistence call.
+
+## GUI milestone 3: Meal management
+
+- Date: 23 October 2026 (session date).
+- Task: Add meal entry and management alongside the workout interface.
+- Files changed: `gui.py`, `fitfor/gui_support.py`, `tests/test_gui_support.py`
+  and this log.
+- Implemented: Date/type/food/nutrient/notes fields, save and clear actions,
+  scrollable meal table, shared refresh and confirmed meal deletion. Both
+  interfaces retain the same JSON schema and domain models.
+- Problem considered: The existing model requires meal type although the
+  suggested screen grouped this into a meal name.
+- Resolution: Include an explicit meal-type field; carbohydrates and fat start
+  at zero, matching existing defaults. All values use shared validators.
+- Tests: Full suite: 211 passed, 0 failed (11 additional meal adapter cases).
+  Real-window end-to-end checks remain scheduled after all views are complete.
+- Commit: `feat: add graphical meal management`.
+- Publication: Workout commit `4c040e4` pushed successfully to origin/master.
+- What was learned: Student reflection pending; explain how shared validation
+  keeps numeric rules consistent across two interfaces.

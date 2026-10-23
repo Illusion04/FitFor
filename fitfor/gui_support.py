@@ -8,6 +8,8 @@ from fitfor.models import Meal, Workout
 from fitfor.storage import Storage
 from fitfor.validation import (
     validate_date,
+    validate_non_negative_float,
+    validate_non_negative_int,
     validate_positive_int,
     validate_text,
     validate_weight,
@@ -35,6 +37,20 @@ def volume_text(workout: Workout) -> str:
     if volume is None:
         return "-"
     return f"{volume:,.2f}" if isfinite(volume) else "Out of range"
+
+
+def meal_from_form(values: Mapping[str, str]) -> Meal:
+    """Build the existing meal model using shared numeric and text rules."""
+    return Meal(
+        log_date=validate_date(values.get("log_date", "")),
+        meal_type=validate_text(values.get("meal_type", ""), "Meal type"),
+        food=validate_text(values.get("food", ""), "Food"),
+        calories=validate_non_negative_int(values.get("calories", ""), "Calories"),
+        protein_g=validate_non_negative_float(values.get("protein_g", ""), "Protein"),
+        carbs_g=validate_non_negative_float(values.get("carbs_g", "0"), "Carbohydrates"),
+        fat_g=validate_non_negative_float(values.get("fat_g", "0"), "Fat"),
+        notes=validate_text(values.get("notes", ""), "Notes", required=False),
+    )
 
 
 def delete_record(

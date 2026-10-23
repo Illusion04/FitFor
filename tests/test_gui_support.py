@@ -5,7 +5,9 @@ from datetime import date
 
 import pytest
 
-from fitfor.gui_support import delete_record, volume_text, workout_from_form
+from fitfor.gui_support import (
+    delete_record, meal_from_form, volume_text, workout_from_form,
+)
 from fitfor.models import Meal, Workout
 from fitfor.storage import Storage
 
@@ -135,3 +137,44 @@ def test_gui_volume_display_handles_overflow(sets, weight):
     assert volume_text(Workout(
         date(2026, 10, 23), "Sample", sets, 8, weight,
     )) == "Out of range"
+
+
+@pytest.fixture
+def meal_fields():
+    return {
+        "log_date": "2026-10-23", "meal_type": " lunch ", "food": " Sample bowl ",
+        "calories": "520", "protein_g": "35.5", "carbs_g": "60", "fat_g": "15",
+        "notes": " synthetic ",
+    }
+
+
+def test_meal_form_round_trips_through_shared_storage(tmp_path, meal_fields):
+    storage = Storage(tmp_path / "records.json")
+    meal = meal_from_form(meal_fields)
+    assert meal == Meal(date(2026, 10, 23), "lunch", "Sample bowl", 520, 35.5,
+                        carbs_g=60.0, fat_g=15.0, notes="synthetic")
+    saved = storage.add_meal(meal)
+    assert storage.load_meals() == [saved]
+
+
+@pytest.mark.parametrize(("field", "value", "message"), [
+    ("log_date", "23/10/2026", "Date"), ("meal_type", " ", "Meal type"),
+    ("food", " ", "Food"), ("calories", "-1", "Calories"),
+    ("calories", "2.5", "Calories"), ("protein_g", "-1", "Protein"),
+    ("carbs_g", "nan", "Carbohydrates"), ("fat_g", "-1", "Fat"),
+])
+def test_meal_form_uses_shared_validation(meal_fields, field, value, message):
+    meal_fields[field] = value
+    with pytest.raises(ValueError, match=message):
+        meal_from_form(meal_fields)
+
+
+@pytest.mark.parametrize("confirmed", [False, True])
+def test_gui_meal_deletion_keeps_other_records(tmp_path, confirmed):
+    storage = Storage(tmp_path / "records.json")
+    first = storage.add_meal(Meal(date(2026, 10, 23), "lunch", "Sample", 100, 10))
+    other = storage.add_meal(replace(first, food="Other sample"))
+    workout = storage.add_workout(Workout(date(2026, 10, 23), "Sample", 1, 1))
+    assert delete_record(storage, "meal", first.id, lambda target: confirmed) is confirmed
+    assert storage.load_meals() == ([other] if confirmed else [first, other])
+    assert storage.load_workouts() == [workout]

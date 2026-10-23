@@ -7,7 +7,9 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-from fitfor.gui_support import delete_record, volume_text, workout_from_form
+from fitfor.gui_support import (
+    delete_record, meal_from_form, volume_text, workout_from_form,
+)
 from fitfor.models import Workout
 from fitfor.storage import DEFAULT_DATA_PATH, Storage, StorageError
 
@@ -189,7 +191,8 @@ class FitForApp(ttk.Frame):
         frame.grid(row=row, column=column, columnspan=columnspan,
                    sticky="ew", padx=(0, 12), pady=(0, 9))
         ttk.Label(frame, text=label, style="Card.TLabel").pack(anchor="w")
-        value = date.today().isoformat() if name == "log_date" else ""
+        value = (date.today().isoformat() if name == "log_date"
+                 else "0" if name in ("carbs_g", "fat_g") else "")
         fields[name] = tk.StringVar(self.root, value=value)
         entry = ttk.Entry(frame, textvariable=fields[name], width=12)
         entry.pack(fill="x", pady=(5, 0))
@@ -221,7 +224,8 @@ class FitForApp(ttk.Frame):
 
     def _clear_form(self, kind: str) -> None:
         for name, variable in self.forms[kind].items():
-            variable.set(date.today().isoformat() if name == "log_date" else "")
+            variable.set(date.today().isoformat() if name == "log_date"
+                         else "0" if name in ("carbs_g", "fat_g") else "")
         self.status.set("Form cleared. Saved records are unchanged.")
 
     def _show_error(self, title: str, message: str) -> None:
@@ -248,6 +252,7 @@ class FitForApp(ttk.Frame):
         """Reload shared storage; never silently reset an unreadable file."""
         try:
             workouts = self.storage.load_workouts()
+            meals = self.storage.load_meals()
         except StorageError as error:
             self._show_error("Unable to load records", str(error))
             return False
@@ -268,6 +273,23 @@ class FitForApp(ttk.Frame):
         count = len(workouts)
         self.workout_count.set(
             "No workouts yet" if count == 0 else f"Workout entries ({count})"
+        )
+        self.records["meal"] = {entry.id: entry for entry in meals}
+        tree = self.trees["meal"]
+        tree.delete(*tree.get_children())
+        for index, entry in enumerate(sorted(
+            meals, key=lambda item: (item.log_date, item.id), reverse=True,
+        )):
+            tree.insert("", "end", iid=str(entry.id), tags=(
+                "even" if index % 2 == 0 else "odd",
+            ), values=(
+                entry.log_date.isoformat(), entry.meal_type, entry.food,
+                entry.calories, f"{entry.protein_g:,.1f}",
+                f"{entry.carbs_g:,.1f}", f"{entry.fat_g:,.1f}", entry.notes,
+            ))
+        count = len(meals)
+        self.meal_count.set(
+            "No meals yet" if count == 0 else f"Meal entries ({count})"
         )
         self.status.set("Records refreshed.")
         return True
@@ -308,9 +330,65 @@ class FitForApp(ttk.Frame):
             self.status.set("Deletion cancelled. Record preserved.")
 
     def _build_meals(self) -> None:
+        tab = self.tabs["Meals"]
         self._page_header(
-            self.tabs["Meals"], "Meal log",
+            tab, "Meal log",
             "Keep food entries and their recorded nutrients together.",
+        )
+        card = ttk.Frame(tab, style="Card.TFrame", padding=14)
+        card.pack(fill="x", pady=(0, 14))
+        for column in range(4):
+            card.columnconfigure(column, weight=1)
+        fields = {}
+        self.forms["meal"] = fields
+        self._form_field(card, fields, "log_date", "Date (YYYY-MM-DD)", 0, 0)
+        self._form_field(card, fields, "meal_type", "Meal type (e.g. lunch)", 0, 1)
+        self._form_field(card, fields, "food", "Food / meal name", 0, 2, 2)
+        for column, (name, label) in enumerate([
+            ("calories", "Calories (kcal)"), ("protein_g", "Protein (g)"),
+            ("carbs_g", "Carbohydrates (g)"), ("fat_g", "Fat (g)"),
+        ]):
+            self._form_field(card, fields, name, label, 1, column)
+        self._form_field(card, fields, "notes", "Notes (optional)", 2, 0, 4)
+        actions = ttk.Frame(card, style="Card.TFrame")
+        actions.grid(row=3, column=0, columnspan=4, sticky="w", pady=(4, 0))
+        ttk.Button(actions, text="Save Meal", style="Accent.TButton",
+                   command=self._save_meal).pack(side="left", padx=(0, 8))
+        ttk.Button(actions, text="Clear Form",
+                   command=lambda: self._clear_form("meal")).pack(side="left")
+        listing = ttk.Frame(tab, style="Card.TFrame", padding=14)
+        listing.pack(fill="both", expand=True)
+        toolbar = ttk.Frame(listing, style="Card.TFrame")
+        toolbar.pack(fill="x", pady=(0, 10))
+        self.meal_count = tk.StringVar(self.root, value="No meals yet")
+        ttk.Label(toolbar, textvariable=self.meal_count,
+                  style="CardTitle.TLabel").pack(side="left")
+        ttk.Button(toolbar, text="Refresh", command=self.refresh_all).pack(
+            side="right", padx=(8, 0),
+        )
+        ttk.Button(toolbar, text="Delete Selected", style="Danger.TButton",
+                   command=lambda: self._delete_selected("meal")).pack(side="right")
+        self.trees["meal"] = self._table(listing, [
+            ("date", "Date", 100), ("type", "Type", 80),
+            ("food", "Food / meal", 190), ("calories", "kcal", 75),
+            ("protein", "Protein (g)", 90), ("carbs", "Carbs (g)", 90),
+            ("fat", "Fat (g)", 75), ("notes", "Notes", 180),
+        ])
+
+    def _save_meal(self) -> None:
+        try:
+            meal = meal_from_form({
+                name: value.get() for name, value in self.forms["meal"].items()
+            })
+            saved = self.storage.add_meal(meal)
+        except (ValueError, StorageError) as error:
+            self._show_error("Meal not saved", str(error))
+            return
+        refreshed = self.refresh_all()
+        self._clear_form("meal")
+        self.status.set(
+            f"Meal {saved.id} saved."
+            if refreshed else "Meal saved; list could not refresh."
         )
 
     def _build_reports(self) -> None:
