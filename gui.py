@@ -34,13 +34,13 @@ class FitForApp(ttk.Frame):
         self._style()
         self.root.title("FitFor - Workout & Nutrition Tracker")
         self.root.geometry("1100x740")
-        self.root.minsize(960, 660)
+        self.root.minsize(960, 740)
         self.root.configure(background=BACKGROUND)
         self.pack(fill="both", expand=True)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
 
-        header = ttk.Frame(self, style="Brand.TFrame", padding=(28, 20))
+        header = ttk.Frame(self, style="Brand.TFrame", padding=(28, 12))
         header.grid(row=0, column=0, sticky="ew")
         brand = ttk.Frame(header, style="Brand.TFrame")
         brand.pack(side="left")
@@ -58,10 +58,10 @@ class FitForApp(ttk.Frame):
 
         self.notebook = ttk.Notebook(self)
         self.notebook.grid(row=1, column=0, sticky="nsew",
-                           padx=24, pady=(20, 12))
+                           padx=24, pady=(12, 12))
         self.tabs = {}
         for name in ("Dashboard", "Workouts", "Meals", "Reports", "Privacy"):
-            tab = ttk.Frame(self.notebook, padding=(22, 18))
+            tab = ttk.Frame(self.notebook, padding=(20, 14))
             self.notebook.add(tab, text=name)
             self.tabs[name] = tab
         self._build_dashboard()
@@ -90,25 +90,29 @@ class FitForApp(ttk.Frame):
         style.configure("Card.TLabel", background=CARD)
         style.configure("CardTitle.TLabel", background=CARD,
                         font=("Segoe UI", 11, "bold"))
+        style.configure("Metric.TLabel", background=CARD, foreground=ACCENT,
+                        font=("Segoe UI", 16, "bold"))
+        style.configure("MetricCaption.TLabel", background=CARD,
+                        foreground=MUTED, font=("Segoe UI", 9))
         style.configure("Brand.TFrame", background="#153b43")
         style.configure("BrandTitle.TLabel", background="#153b43",
-                        foreground=CARD, font=("Segoe UI", 25, "bold"))
+                        foreground=CARD, font=("Segoe UI", 23, "bold"))
         style.configure("BrandSubtitle.TLabel", background="#153b43",
                         foreground="#c2d7da")
         style.configure("BrandBadge.TLabel", background="#24535a",
                         foreground="#def3ec", font=("Segoe UI", 9, "bold"))
         style.configure("TNotebook", background=BACKGROUND, borderwidth=0)
         style.configure("TNotebook.Tab", background="#e5edef",
-                        foreground=MUTED, padding=(24, 11))
+                        foreground=MUTED, padding=(24, 9))
         style.map("TNotebook.Tab", background=[("selected", CARD)],
                   foreground=[("selected", ACCENT)],
-                  padding=[("selected", (24, 11))])
-        style.configure("TButton", padding=(14, 9))
+                  padding=[("selected", (24, 9))])
+        style.configure("TButton", padding=(14, 7))
         style.configure("Accent.TButton", background=ACCENT, foreground=CARD)
         style.map("Accent.TButton", background=[("active", "#0e665e")])
         style.configure("Danger.TButton", foreground="#a43c3c")
-        style.configure("TEntry", padding=(8, 7))
-        style.configure("TCombobox", padding=(8, 7))
+        style.configure("TEntry", padding=(8, 5))
+        style.configure("TCombobox", padding=(8, 5))
         style.configure("Treeview", background=CARD, fieldbackground=CARD,
                         rowheight=30, borderwidth=0)
         style.configure("Treeview.Heading", background="#e8eff1",
@@ -120,12 +124,12 @@ class FitForApp(ttk.Frame):
 
     def _page_header(self, tab: ttk.Frame, title: str, subtitle: str):
         header = ttk.Frame(tab)
-        header.pack(fill="x", pady=(0, 18))
+        header.pack(fill="x", pady=(0, 12))
         text = ttk.Frame(header)
         text.pack(side="left", fill="x", expand=True)
         ttk.Label(text, text=title, style="PageTitle.TLabel").pack(anchor="w")
         ttk.Label(text, text=subtitle, style="Muted.TLabel").pack(
-            anchor="w", pady=(5, 0),
+            anchor="w", pady=(3, 0),
         )
         return header
 
@@ -141,7 +145,7 @@ class FitForApp(ttk.Frame):
         cards.columnconfigure((0, 1), weight=1)
         self.dashboard_workout = self._summary_card(cards, "WORKOUTS / ALL DATES", [
             ("workout_entries", "Exercise entries"), ("total_sets", "Total sets"),
-            ("total_reps", "Total reps"), ("recorded_volume", "Recorded volume (kg × reps)"),
+            ("total_reps", "Total reps"), ("recorded_volume", "Volume (kg × reps)"),
         ], 0)
         self.dashboard_nutrition = self._summary_card(cards, "NUTRITION / TODAY", [
             ("total_calories", "Calories (kcal)"), ("total_protein_g", "Protein (g)"),
@@ -160,23 +164,30 @@ class FitForApp(ttk.Frame):
             ("entry", "Recorded entry", 600),
         ])
 
-    def _summary_card(self, parent, title, specs, column):
+    def _summary_card(self, parent, title, specs, column, *, compact=False):
         card = ttk.Frame(parent, style="Card.TFrame", padding=(18, 14))
         card.grid(row=0, column=column, sticky="nsew",
                   padx=(0, 8) if column == 0 else (8, 0))
-        card.columnconfigure(0, weight=1)
+        card.columnconfigure((0, 1), weight=1, uniform="metric")
         ttk.Label(card, text=title, style="CardTitle.TLabel").grid(
             row=0, column=0, columnspan=2, sticky="w", pady=(0, 8),
         )
         variables = {}
-        for row, (key, label) in enumerate(specs, start=1):
-            ttk.Label(card, text=label, style="Card.TLabel").grid(
-                row=row, column=0, sticky="w", pady=4,
-            )
+        for index, (key, label) in enumerate(specs):
             variables[key] = tk.StringVar(self.root, value="—")
-            ttk.Label(card, textvariable=variables[key], style="CardTitle.TLabel").grid(
-                row=row, column=1, sticky="e", padx=(12, 0), pady=4,
-            )
+            if compact:
+                ttk.Label(card, text=label, style="Card.TLabel").grid(
+                    row=index + 1, column=0, sticky="w", pady=1,
+                )
+                ttk.Label(card, textvariable=variables[key], style="CardTitle.TLabel").grid(
+                    row=index + 1, column=1, sticky="e", pady=1,
+                )
+                continue
+            metric = ttk.Frame(card, style="Card.TFrame")
+            metric.grid(row=1 + index // 2, column=index % 2,
+                        sticky="ew", padx=(0, 12), pady=(3, 6))
+            ttk.Label(metric, text=label, style="MetricCaption.TLabel").pack(anchor="w")
+            ttk.Label(metric, textvariable=variables[key], style="Metric.TLabel").pack(anchor="w")
         return variables
 
     @staticmethod
@@ -213,8 +224,8 @@ class FitForApp(ttk.Frame):
             tab, "Workout log",
             "Record an exercise, then review your entries below.",
         )
-        card = ttk.Frame(tab, style="Card.TFrame", padding=16)
-        card.pack(fill="x", pady=(0, 16))
+        card = ttk.Frame(tab, style="Card.TFrame", padding=12)
+        card.pack(fill="x", pady=(0, 12))
         fields = {}
         self.forms["workout"] = fields
         specs = [
@@ -262,13 +273,13 @@ class FitForApp(ttk.Frame):
     ):
         frame = ttk.Frame(parent, style="Card.TFrame")
         frame.grid(row=row, column=column, columnspan=columnspan,
-                   sticky="ew", padx=(0, 12), pady=(0, 9))
+                   sticky="ew", padx=(0, 12), pady=(0, 6))
         ttk.Label(frame, text=label, style="Card.TLabel").pack(anchor="w")
         value = (date.today().isoformat() if name == "log_date"
                  else "0" if name in ("carbs_g", "fat_g") else "")
         fields[name] = tk.StringVar(self.root, value=value)
         entry = ttk.Entry(frame, textvariable=fields[name], width=12)
-        entry.pack(fill="x", pady=(5, 0))
+        entry.pack(fill="x", pady=(3, 0))
         return entry
 
     def _table(self, parent, columns):
@@ -470,28 +481,34 @@ class FitForApp(ttk.Frame):
         tab = self.tabs["Reports"]
         self._page_header(
             tab, "Reports",
-            "Descriptive totals from your records. Dates include both endpoints.",
+            "Descriptive totals. Optional dates: YYYY-MM-DD; both endpoints included.",
         )
         filters = ttk.Frame(tab, style="Card.TFrame", padding=(16, 10))
         filters.pack(fill="x", pady=(0, 14))
         self.report_fields = {}
         self.report_period = ("", "")
-        self._form_field(filters, self.report_fields, "start", "Start date (optional)", 0, 0)
-        self._form_field(filters, self.report_fields, "end", "End date (optional)", 0, 1)
+        for column, (key, label) in enumerate([("start", "Start date"), ("end", "End date")]):
+            self.report_fields[key] = tk.StringVar(self.root)
+            ttk.Label(filters, text=label, style="Card.TLabel").grid(
+                row=0, column=column * 2, padx=(0, 8),
+            )
+            ttk.Entry(filters, textvariable=self.report_fields[key], width=12).grid(
+                row=0, column=column * 2 + 1, padx=(0, 16),
+            )
         ttk.Button(filters, text="Generate Report", style="Accent.TButton",
-                   command=self._generate_reports).grid(row=0, column=2, padx=(4, 8))
-        ttk.Button(filters, text="All Dates", command=self._all_dates).grid(row=0, column=3)
+                   command=self._generate_reports).grid(row=0, column=4, padx=(4, 8))
+        ttk.Button(filters, text="All Dates", command=self._all_dates).grid(row=0, column=5)
         cards = ttk.Frame(tab)
         cards.pack(fill="x")
         cards.columnconfigure((0, 1), weight=1)
         self.report_workout = self._summary_card(cards, "WORKOUT SUMMARY", [
             ("workout_entries", "Exercise entries"), ("total_sets", "Total sets"),
-            ("total_reps", "Total reps"), ("recorded_volume", "Recorded volume (kg × reps)"),
-        ], 0)
+            ("total_reps", "Total reps"), ("recorded_volume", "Volume (kg × reps)"),
+        ], 0, compact=True)
         self.report_nutrition = self._summary_card(cards, "NUTRITION SUMMARY", [
             ("total_calories", "Calories (kcal)"), ("total_protein_g", "Protein (g)"),
             ("total_carbs_g", "Carbohydrates (g)"), ("total_fat_g", "Fat (g)"),
-        ], 1)
+        ], 1, compact=True)
         self.report_note = tk.StringVar(self.root)
         ttk.Label(tab, textvariable=self.report_note, style="Muted.TLabel").pack(
             anchor="w", pady=(10, 12),

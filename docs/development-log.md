@@ -384,3 +384,28 @@ the user's updated instruction; credentials and history were not modified.
 - Publication: Reports milestone `a1df7b3` pushed to origin/master.
 - What was learned: Student reflection pending; explain why visual inspection
   complements headless tests and why privacy text must describe actual controls.
+
+## GUI milestone 7: Integration and real-window verification
+
+- Date: 23 October 2026 (session date).
+- Task: Verify end-to-end desktop behaviour and compatibility with the CLI.
+- Files changed: `gui.py`, `tests/test_gui_integration.py`,
+  `docs/gui-smoke-test.md`, `docs/gui-pytest-results.txt` and this log.
+- Implemented: Five additional integration/launcher tests. Preserved all 182
+  original tests; 47 GUI-related cases now bring the suite to 229.
+- Problems encountered: Display scaling left too little room for table rows
+  and daily report totals despite passing headless tests.
+- Resolution: Reduce vertical padding, compact the report filter/summary,
+  use dashboard metric tiles and retain a 740-pixel minimum logical height.
+- Tests: Full suite: 229 passed, 0 failed in 1.30 s. Actual window checks cover
+  saves, retained invalid input, six required validation cases, persistence,
+  dashboards/reports, date filtering, default-No cancellation, confirmed
+  workout/meal deletion, no selection, privacy, maximize/restore and clean exit.
+  The unchanged CLI also displayed both GUI-created synthetic records.
+- Evidence: Full observed results and explicit testing limits are in
+  `docs/gui-smoke-test.md`; complete pytest output is saved separately.
+  No screenshot files or personal reflections were fabricated.
+- Commit: `test: verify FitFor GUI integration`.
+- Publication: Privacy milestone `ebd4d60` pushed to origin/master.
+- What was learned: Student reflection pending; describe the layout problem
+  found by native testing and how shared storage was verified in both directions.
