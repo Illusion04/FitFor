@@ -325,3 +325,23 @@ the user's updated instruction; credentials and history were not modified.
 - Publication: Workout commit `4c040e4` pushed successfully to origin/master.
 - What was learned: Student reflection pending; explain how shared validation
   keeps numeric rules consistent across two interfaces.
+
+## GUI milestone 4: Activity dashboard
+
+- Date: 23 October 2026 (session date).
+- Task: Present all-time workout totals, today's nutrition and recent activity.
+- Files changed: `gui.py`, `fitfor/gui_support.py`, `tests/test_gui_support.py`
+  and this log.
+- Implemented: Two summary cards, explicit units, eight recent entries, Refresh
+  and friendly empty-state guidance. Existing report functions calculate totals.
+- Problem considered: Unknown loads must not be treated as zero recorded load,
+  and nutrition from earlier dates must not appear in today's totals.
+- Resolution: Use the domain summary functions with today as both nutrition
+  bounds. Label volume as recorded kg × reps. Report overflow is explained
+  without stopping record management.
+- Tests: Full suite: 214 passed, 0 failed; new cases cover empty data, date
+  separation, known totals and recent-activity ordering/limit.
+- Commit: `feat: add FitFor activity dashboard`.
+- Publication: Meal milestone `d60d23a` pushed successfully to origin/master.
+- What was learned: Student reflection pending; explain separating presentation
+  from calculation and choosing an explicit time period for each metric.

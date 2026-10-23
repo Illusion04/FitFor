@@ -8,7 +8,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 
 from fitfor.gui_support import (
-    delete_record, meal_from_form, volume_text, workout_from_form,
+    dashboard_data, delete_record, meal_from_form, volume_text, workout_from_form,
 )
 from fitfor.models import Workout
 from fitfor.storage import DEFAULT_DATA_PATH, Storage, StorageError
@@ -129,10 +129,82 @@ class FitForApp(ttk.Frame):
         return header
 
     def _build_dashboard(self) -> None:
-        self._page_header(
+        header = self._page_header(
             self.tabs["Dashboard"], "Your activity at a glance",
             "An overview of your recorded workouts and nutrition.",
         )
+        ttk.Button(header, text="Refresh", command=self.refresh_all).pack(side="right")
+        tab = self.tabs["Dashboard"]
+        cards = ttk.Frame(tab)
+        cards.pack(fill="x")
+        cards.columnconfigure((0, 1), weight=1)
+        self.dashboard_workout = self._summary_card(cards, "WORKOUTS / ALL DATES", [
+            ("workout_entries", "Exercise entries"), ("total_sets", "Total sets"),
+            ("total_reps", "Total reps"), ("recorded_volume", "Recorded volume (kg × reps)"),
+        ], 0)
+        self.dashboard_nutrition = self._summary_card(cards, "NUTRITION / TODAY", [
+            ("total_calories", "Calories (kcal)"), ("total_protein_g", "Protein (g)"),
+            ("total_carbs_g", "Carbohydrates (g)"), ("total_fat_g", "Fat (g)"),
+        ], 1)
+        self.dashboard_note = tk.StringVar(self.root)
+        ttk.Label(tab, textvariable=self.dashboard_note, style="Muted.TLabel").pack(
+            anchor="w", pady=(12, 14),
+        )
+        recent = ttk.Frame(tab, style="Card.TFrame", padding=16)
+        recent.pack(fill="both", expand=True)
+        ttk.Label(recent, text="Recent activity / latest 8 entries",
+                  style="CardTitle.TLabel").pack(anchor="w", pady=(0, 10))
+        self.trees["recent"] = self._table(recent, [
+            ("date", "Date", 130), ("type", "Type", 120),
+            ("entry", "Recorded entry", 600),
+        ])
+
+    def _summary_card(self, parent, title, specs, column):
+        card = ttk.Frame(parent, style="Card.TFrame", padding=(18, 14))
+        card.grid(row=0, column=column, sticky="nsew",
+                  padx=(0, 8) if column == 0 else (8, 0))
+        card.columnconfigure(0, weight=1)
+        ttk.Label(card, text=title, style="CardTitle.TLabel").grid(
+            row=0, column=0, columnspan=2, sticky="w", pady=(0, 8),
+        )
+        variables = {}
+        for row, (key, label) in enumerate(specs, start=1):
+            ttk.Label(card, text=label, style="Card.TLabel").grid(
+                row=row, column=0, sticky="w", pady=4,
+            )
+            variables[key] = tk.StringVar(self.root, value="—")
+            ttk.Label(card, textvariable=variables[key], style="CardTitle.TLabel").grid(
+                row=row, column=1, sticky="e", padx=(12, 0), pady=4,
+            )
+        return variables
+
+    @staticmethod
+    def _set_metrics(variables, values):
+        for key, variable in variables.items():
+            value = values.get(key)
+            variable.set("—" if value is None else
+                         f"{value:,}" if isinstance(value, int) else f"{value:,.2f}")
+
+    def _refresh_dashboard(self, workouts, meals) -> None:
+        tree = self.trees["recent"]
+        tree.delete(*tree.get_children())
+        try:
+            data = dashboard_data(workouts, meals, today=date.today())
+        except ValueError as error:
+            self._set_metrics(self.dashboard_workout, {})
+            self._set_metrics(self.dashboard_nutrition, {})
+            self.dashboard_note.set(f"Summary unavailable: {error}")
+            return
+        self._set_metrics(self.dashboard_workout, data["workouts"])
+        self._set_metrics(self.dashboard_nutrition, data["nutrition"])
+        self.dashboard_note.set(
+            "No activity recorded yet. Start in Workouts or Meals."
+            if not data["recent"] else
+            f"Today: {date.today().isoformat()} · Unknown workout loads are excluded from volume."
+        )
+        for index, (day, kind, name, _) in enumerate(data["recent"]):
+            tree.insert("", "end", values=(day.isoformat(), kind, name),
+                        tags=("even" if index % 2 == 0 else "odd",))
 
     def _build_workouts(self) -> None:
         tab = self.tabs["Workouts"]
@@ -291,6 +363,7 @@ class FitForApp(ttk.Frame):
         self.meal_count.set(
             "No meals yet" if count == 0 else f"Meal entries ({count})"
         )
+        self._refresh_dashboard(workouts, meals)
         self.status.set("Records refreshed.")
         return True
 

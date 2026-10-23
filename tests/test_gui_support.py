@@ -6,7 +6,7 @@ from datetime import date
 import pytest
 
 from fitfor.gui_support import (
-    delete_record, meal_from_form, volume_text, workout_from_form,
+    dashboard_data, delete_record, meal_from_form, volume_text, workout_from_form,
 )
 from fitfor.models import Meal, Workout
 from fitfor.storage import Storage
@@ -178,3 +178,37 @@ def test_gui_meal_deletion_keeps_other_records(tmp_path, confirmed):
     assert delete_record(storage, "meal", first.id, lambda target: confirmed) is confirmed
     assert storage.load_meals() == ([other] if confirmed else [first, other])
     assert storage.load_workouts() == [workout]
+
+
+def test_empty_dashboard_has_zero_totals_and_no_activity():
+    data = dashboard_data([], [], today=date(2026, 10, 23))
+    assert data["workouts"]["workout_entries"] == 0
+    assert data["workouts"]["recorded_volume"] == 0.0
+    assert data["nutrition"]["total_calories"] == 0
+    assert data["recent"] == []
+
+
+def test_dashboard_uses_all_workouts_but_only_todays_nutrition():
+    today = date(2026, 10, 23)
+    old = date(2026, 10, 22)
+    workouts = [Workout(old, "Sample", 3, 8, 12.5), Workout(today, "Sample", 2, 5)]
+    meals = [Meal(old, "lunch", "Old sample", 100, 10),
+             Meal(today, "lunch", "Current sample", 520, 35, carbs_g=60, fat_g=15)]
+    data = dashboard_data(workouts, meals, today=today)
+    assert data["workouts"]["workout_entries"] == 2
+    assert data["workouts"]["total_sets"] == 5
+    assert data["workouts"]["total_reps"] == 34
+    assert data["workouts"]["recorded_volume"] == 300
+    assert data["nutrition"] == {
+        "meal_entries": 1, "total_calories": 520, "total_protein_g": 35.0,
+        "total_carbs_g": 60.0, "total_fat_g": 15.0,
+    }
+    assert [row[0] for row in data["recent"]] == [today, today, old, old]
+
+
+def test_dashboard_limits_recent_activity_without_mutating_source():
+    workouts = [Workout(date(2026, 10, day), f"Sample {day}", 1, 1) for day in range(1, 15)]
+    data = dashboard_data(workouts, [], today=date(2026, 10, 23))
+    assert len(data["recent"]) == 8
+    assert data["recent"][0][2] == "Sample 14"
+    assert workouts[0].exercise == "Sample 1"

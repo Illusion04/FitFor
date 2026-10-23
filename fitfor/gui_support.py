@@ -1,10 +1,12 @@
 """Headless adapters for desktop forms and confirmation-driven actions."""
 
 from collections.abc import Callable, Mapping
+from datetime import date
 from math import isfinite
 from typing import Literal
 
 from fitfor.models import Meal, Workout
+from fitfor.reports import nutrition_summary, workout_summary
 from fitfor.storage import Storage
 from fitfor.validation import (
     validate_date,
@@ -51,6 +53,24 @@ def meal_from_form(values: Mapping[str, str]) -> Meal:
         fat_g=validate_non_negative_float(values.get("fat_g", "0"), "Fat"),
         notes=validate_text(values.get("notes", ""), "Notes", required=False),
     )
+
+
+def dashboard_data(
+    workouts: list[Workout], meals: list[Meal], *, today: date,
+) -> dict:
+    """Combine existing summaries with the eight most recent dated entries."""
+    recent = [
+        (entry.log_date, "Workout", entry.exercise, entry.id or 0)
+        for entry in workouts
+    ] + [
+        (entry.log_date, "Meal", entry.food, entry.id or 0) for entry in meals
+    ]
+    recent.sort(key=lambda row: (row[0], row[3]), reverse=True)
+    return {
+        "workouts": workout_summary(workouts),
+        "nutrition": nutrition_summary(meals, today, today),
+        "recent": recent[:8],
+    }
 
 
 def delete_record(
